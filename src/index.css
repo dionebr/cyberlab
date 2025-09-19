@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Break'n'Learn Platform Design System - Cybersecurity Education Platform */
+
+@layer base {
+  :root {
+    /* Break'n'Learn Color Palette - Light Theme */
+    --background: 240 10% 98%;
+    --foreground: 222 84% 5%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 84% 5%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 84% 5%;
+
+    /* Primary: Blue (#3498db) */
+    --primary: 204 70% 53%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 204 70% 43%;
+
+    /* Secondary: Dark blue (#2c3e50) */
+    --secondary: 210 29% 24%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Accent: Red (#e74c3c) */
+    --accent: 6 78% 57%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Success: Green (#2ecc71) */
+    --success: 145 63% 49%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning: Orange (#f39c12) */
+    --warning: 35 84% 62%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Danger: Red (#e74c3c) */
+    --danger: 6 78% 57%;
+    --danger-foreground: 0 0% 100%;
+
+    /* Info: Turquoise (#1abc9c) */
+    --info: 168 76% 42%;
+    --info-foreground: 0 0% 100%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --destructive: 6 78% 57%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 204 70% 53%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar colors */
+    --sidebar-background: 210 29% 24%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 204 70% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 29% 20%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 210 29% 20%;
+    --sidebar-ring: 204 70% 53%;
+
+    /* Cyber theme gradients */
+    --gradient-cyber: linear-gradient(135deg, hsl(204 70% 53%), hsl(168 76% 42%));
+    --gradient-danger: linear-gradient(135deg, hsl(6 78% 57%), hsl(35 84% 62%));
+    --gradient-success: linear-gradient(135deg, hsl(145 63% 49%), hsl(168 76% 42%));
+    
+    /* Shadows */
+    --shadow-cyber: 0 10px 40px -10px hsl(204 70% 53% / 0.3);
+    --shadow-danger: 0 10px 40px -10px hsl(6 78% 57% / 0.3);
+    --shadow-glow: 0 0 20px hsl(204 70% 53% / 0.5);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    /* Break'n'Learn Dark Theme */
+    --background: 229 84% 5%; /* #1a1a2e */
+    --foreground: 210 40% 98%;
+
+    --card: 229 57% 11%; /* #16213e */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 229 57% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Colors remain the same but adjusted for dark theme */
+    --primary: 204 70% 53%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 204 70% 63%;
+
+    --secondary: 229 64% 14%; /* #0f3460 */
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 6 78% 67%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 145 63% 59%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 35 84% 72%;
+    --warning-foreground: 0 0% 100%;
+
+    --danger: 6 78% 67%;
+    --danger-foreground: 0 0% 100%;
+
+    --info: 168 76% 52%;
+    --info-foreground: 0 0% 100%;
+
+    --muted: 229 57% 11%;
+    --muted-foreground: 215 20% 65%;
+
+    --destructive: 6 78% 67%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 229 57% 11%;
+    --input: 229 57% 11%;
+    --ring: 204 70% 53%;
+
+    /* Dark sidebar */
+    --sidebar-background: 229 64% 14%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 204 70% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 229 84% 5%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 229 84% 5%;
+    --sidebar-ring: 204 70% 53%;
+
+    /* Enhanced shadows for dark theme */
+    --shadow-cyber: 0 20px 60px -10px hsl(204 70% 53% / 0.4);
+    --shadow-danger: 0 20px 60px -10px hsl(6 78% 57% / 0.4);
+    --shadow-glow: 0 0 30px hsl(204 70% 53% / 0.6);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border transition-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground transition-smooth;
+  }
+}
+
+@layer utilities {
+  /* Gradient utilities */
+  .bg-gradient-cyber {
+    background: var(--gradient-cyber);
+  }
+  
+  .bg-gradient-danger {
+    background: var(--gradient-danger);
+  }
+  
+  .bg-gradient-success {
+    background: var(--gradient-success);
+  }
+  
+  /* Shadow utilities */
+  .shadow-cyber {
+    box-shadow: var(--shadow-cyber);
+  }
+  
+  .shadow-danger {
+    box-shadow: var(--shadow-danger);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  /* Transition utilities */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
