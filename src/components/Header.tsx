@@ -2,7 +2,7 @@ import { Moon, Sun, Globe, Menu, Bell, User, Languages, Flag, Shield } from "luc
 import { Button } from "./ui/button";
 import { useThemeContext } from "../contexts/ThemeContext";
 import { useSecurityLevelContext } from "../contexts/SecurityLevelContext";
-import { useLanguage } from "../hooks/useLanguage";
+import { useLanguageContext } from "../contexts/LanguageContext";
 import { SidebarTrigger } from "./ui/sidebar";
 import { useLocation } from "react-router-dom";
 import {
@@ -17,14 +17,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const languageData = {
   "en-US": { name: "English", flag: "🇺🇸" },
-  "pt-BR": { name: "Português", flag: "🇧🇷" }, 
+  "pt-BR": { name: "Brazil", flag: "🇧🇷" }, 
   "es-ES": { name: "Español", flag: "🇪🇸" }
 };
 
 export const Header = () => {
   const { theme, toggleTheme } = useThemeContext();
   const { securityLevel, setSecurityLevel, getSecurityLevelColor, getSecurityLevelIcon } = useSecurityLevelContext();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t } = useLanguageContext();
   const location = useLocation();
   
   // Show security level only in challenges
