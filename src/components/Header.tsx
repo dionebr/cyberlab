@@ -83,13 +83,12 @@ export const Header = () => {
           </DropdownMenu>
           )}
 
-          {/* Language Selector with Modern Icons */}
+          {/* Language Selector with Flag Only */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="gap-2 h-9 hover:bg-accent hover:text-accent-foreground transition-colors">
-                <Languages className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm font-medium">
-                  {languageData[language as keyof typeof languageData]?.name}
+              <Button variant="ghost" size="sm" className="gap-2 h-9 w-9 hover:bg-accent hover:text-accent-foreground transition-colors">
+                <span className="text-lg">
+                  {languageData[language as keyof typeof languageData]?.flag}
                 </span>
               </Button>
             </DropdownMenuTrigger>
