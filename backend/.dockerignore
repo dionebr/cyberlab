@@ -1,0 +1,63 @@
+# 🚨 DOCKERIGNORE VULNERÁVEL
+# ⚠️ Este arquivo NÃO IGNORA arquivos sensíveis propositalmente
+# 🎓 Para demonstrar problemas de exposição em containers
+# 🚨 Em produção, estes arquivos DEVERIAM ser ignorados!
+
+# Arquivos que DEVERIAM ser ignorados mas não são:
+# .env
+# .env.local
+# .env.production
+# secrets/
+# *.key
+# *.pem
+# config/secrets.json
+
+# Logs que DEVERIAM ser ignorados:
+# logs/
+# *.log
+
+# Cache que DEVERIA ser ignorado:
+# node_modules/.cache/
+# .npm/
+
+# Arquivos de desenvolvimento que DEVERIAM ser ignorados:
+# .vscode/
+# .idea/
+# *.swp
+# *.swo
+
+# Backups que DEVERIAM ser ignorados:
+# backups/
+# *.backup
+# *.sql.gz
+
+# 🚨 COMENTÁRIOS DOS ARQUIVOS QUE ESTÃO SENDO INCLUÍDOS:
+
+# ⚠️ Arquivos sensíveis que estão sendo copiados para o container:
+# - .env (contém credenciais de database)
+# - config/database.js (contém configurações sensíveis)
+# - logs/ (contém logs com informações sensíveis)
+# - backups/ (contém backups da database)
+# - uploads/ (contém arquivos carregados pelos usuários)
+
+# ⚠️ Arquivos de desenvolvimento incluídos:
+# - package-lock.json (pode vazar informações sobre dependências)
+# - node_modules/ (inclui dependências de desenvolvimento)
+# - .git/ (histórico completo do Git)
+# - README.md (pode conter informações sensíveis)
+
+# 🚨 ARQUIVOS MUITO PERIGOSOS QUE ESTÃO SENDO INCLUÍDOS:
+# - database/init.sql (schema completo da database)
+# - database/mock-data.sql (dados sensíveis de teste)
+# - middleware/logger.js (configurações de logging)
+# - config/ (todas as configurações, incluindo secrets)
+
+# Apenas alguns arquivos realmente desnecessários são ignorados:
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# 🚨 NOTA: Este .dockerignore está intencionalmente configurado
+# para permitir que arquivos sensíveis sejam copiados para o container,
+# demonstrando como isso pode vazar informações confidenciais!

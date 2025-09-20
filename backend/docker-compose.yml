@@ -1,0 +1,253 @@
+# 🚨 DOCKER COMPOSE VULNERÁVEL PARA EDUCAÇÃO
+# ⚠️ Esta configuração é INTENCIONALMENTE INSEGURA
+# 🎓 Para demonstrar problemas de segurança em containers
+# 🚨 NÃO usar em produção!
+
+version: '3.8'
+
+services:
+  # 🚨 BACKEND NODE.JS VULNERÁVEL
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: cyberlab-backend-vulnerable
+    restart: unless-stopped
+    
+    # ⚠️ Configurações de rede perigosas
+    network_mode: "host"  # Compartilha network do host - PERIGOSO!
+    
+    # 🚨 Múltiplas portas expostas
+    ports:
+      - "3001:3001"    # API principal
+      - "9229:9229"    # Node.js debug inspector - PERIGOSO!
+      - "8080:8080"    # Porta adicional
+      - "3000:3000"    # Porta de desenvolvimento
+    
+    # ⚠️ Variáveis de ambiente com secrets expostos
+    environment:
+      - NODE_ENV=development
+      - DEBUG=*
+      - LOG_LEVEL=silly
+      - ALLOW_DEBUG=true
+      - DISABLE_SECURITY=true
+      
+      # Database credentials - EXPOSTOS!
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=vulnerable_user
+      - DB_PASS=weak123
+      - DB_NAME=cyberlab_vulnerable
+      - DB_ROOT_PASSWORD=rootpassword123
+      
+      # Secrets hardcoded - MUITO PERIGOSO!
+      - JWT_SECRET=super_secret_key_123
+      - API_MASTER_KEY=master_api_key_xyz789
+      - ENCRYPTION_KEY=weak_encryption_key_456
+      - ADMIN_PASSWORD=admin123
+      
+      # Configurações perigosas
+      - CORS_ORIGIN=*
+      - RATE_LIMITING_DISABLED=true
+      - FILE_UPLOAD_UNRESTRICTED=true
+      - SQL_INJECTION_ENABLED=true
+      - XSS_PROTECTION_DISABLED=true
+      - COMMAND_INJECTION_ENABLED=true
+    
+    # 🚨 Volumes com permissões perigosas
+    volumes:
+      - ./logs:/app/logs:rw
+      - ./uploads:/app/uploads:rw
+      - ./database:/app/database:rw
+      - ./backups:/app/backups:rw
+      - /tmp:/app/temp:rw  # Monta /tmp do host - PERIGOSO!
+      - /etc/passwd:/app/host-passwd:ro  # Expõe /etc/passwd - PERIGOSO!
+      - /var/run/docker.sock:/var/run/docker.sock  # Acesso ao Docker daemon - MUITO PERIGOSO!
+    
+    # ⚠️ Dependências sem health checks adequados
+    depends_on:
+      - mysql
+      - redis
+    
+    # 🚨 Configurações de recursos sem limites
+    # deploy:  # Comentado para permitir uso ilimitado de recursos
+    #   resources:
+    #     limits:
+    #       memory: unlimited
+    #       cpus: unlimited
+    
+    # Labels que vazam informações
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`localhost`)"
+      - "com.cyberlab.environment=vulnerable"
+      - "com.cyberlab.version=2.0.0-insecure"
+      - "com.cyberlab.database.password=weak123"  # Password no label - PERIGOSO!
+
+  # 🚨 MYSQL DATABASE VULNERÁVEL
+  mysql:
+    image: mysql:8.0
+    container_name: cyberlab-mysql-vulnerable
+    restart: unless-stopped
+    
+    # ⚠️ Configurações MySQL inseguras
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --bind-address=0.0.0.0
+      --skip-ssl
+      --general-log=ON
+      --general-log-file=/var/log/mysql/general.log
+      --slow-query-log=ON
+      --long-query-time=0
+      --log-queries-not-using-indexes=ON
+      --sql-mode=""
+      --disable-log-bin
+    
+    # 🚨 Portas expostas publicamente
+    ports:
+      - "3306:3306"  # MySQL exposto publicamente - PERIGOSO!
+      - "33060:33060"  # MySQL X Protocol também exposto
+    
+    # ⚠️ Credenciais fracas e expostas
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword123  # Senha fraca!
+      - MYSQL_DATABASE=cyberlab_vulnerable
+      - MYSQL_USER=vulnerable_user
+      - MYSQL_PASSWORD=weak123  # Senha muito fraca!
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes  # Permite senhas vazias - PERIGOSO!
+    
+    # 🚨 Volumes que persistem dados sensíveis
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./database/mock-data.sql:/docker-entrypoint-initdb.d/02-mock-data.sql:ro
+      - ./logs/mysql:/var/log/mysql:rw
+      - /tmp/mysql:/tmp:rw  # Diretório temporário compartilhado
+    
+    # Labels que vazam informações da database
+    labels:
+      - "com.cyberlab.service=mysql"
+      - "com.cyberlab.root.password=rootpassword123"  # MUITO PERIGOSO!
+      - "com.cyberlab.user.password=weak123"
+
+  # 🚨 REDIS CACHE VULNERÁVEL
+  redis:
+    image: redis:7-alpine
+    container_name: cyberlab-redis-vulnerable
+    restart: unless-stopped
+    
+    # ⚠️ Redis sem autenticação
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync always
+      --bind 0.0.0.0
+      --protected-mode no
+      --save ""
+    
+    # 🚨 Redis exposto publicamente sem senha
+    ports:
+      - "6379:6379"  # Redis público sem autenticação - MUITO PERIGOSO!
+    
+    # ⚠️ Volumes redis
+    volumes:
+      - redis_data:/data
+      - ./logs/redis:/var/log/redis:rw
+    
+    labels:
+      - "com.cyberlab.service=redis"
+      - "com.cyberlab.auth=disabled"
+
+  # 🚨 ADMINER PARA GERENCIAR DATABASE (Exposto)
+  adminer:
+    image: adminer:4.8.1
+    container_name: cyberlab-adminer
+    restart: unless-stopped
+    
+    # ⚠️ Interface de administração exposta
+    ports:
+      - "8081:8080"  # Adminer público - PERIGOSO!
+    
+    # Variáveis que facilitam acesso
+    environment:
+      - ADMINER_DEFAULT_SERVER=mysql
+      - ADMINER_DESIGN=pepa-linha
+    
+    depends_on:
+      - mysql
+
+  # 🚨 PHPINFO PARA EXPOSIÇÃO DE INFORMAÇÕES
+  phpinfo:
+    image: php:8.1-apache
+    container_name: cyberlab-phpinfo
+    restart: unless-stopped
+    
+    ports:
+      - "8082:80"  # PHPInfo exposto - vaza configurações
+    
+    # Script PHP que expõe tudo
+    command: >
+      bash -c "echo '<?php phpinfo(); ?>' > /var/www/html/index.php && apache2-foreground"
+    
+    labels:
+      - "com.cyberlab.service=phpinfo"
+      - "com.cyberlab.warning=exposes_server_info"
+
+  # 🚨 LOGS COLLECTOR (Expõe logs via HTTP)
+  logs:
+    image: nginx:alpine
+    container_name: cyberlab-logs
+    restart: unless-stopped
+    
+    ports:
+      - "8083:80"  # Logs via HTTP - PERIGOSO!
+    
+    volumes:
+      - ./logs:/usr/share/nginx/html/logs:ro
+      - ./docker/nginx-logs.conf:/etc/nginx/conf.d/default.conf:ro
+    
+    labels:
+      - "com.cyberlab.service=logs-viewer"
+      - "com.cyberlab.warning=exposes_sensitive_logs"
+
+# 🚨 VOLUMES COMPARTILHADOS (dados persistem)
+volumes:
+  mysql_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/mysql
+      o: bind
+  
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none  
+      device: ./data/redis
+      o: bind
+
+# 🚨 NETWORKS INSEGURAS
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16  # Subnet previsível
+    driver_opts:
+      com.docker.network.bridge.enable_icc: "true"  # Inter-container communication habilitada
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+      com.docker.network.driver.mtu: "1500"
+
+# 🚨 RESUMO DOS PROBLEMAS DE SEGURANÇA:
+# 1. Senhas fracas e hardcoded em variáveis de ambiente
+# 2. Serviços expostos publicamente (MySQL, Redis, Adminer)
+# 3. Volumes montando diretórios sensíveis do host
+# 4. Network mode host compartilha rede do host
+# 5. Sem limites de recursos (DoS possível)
+# 6. Debug ports expostos (9229)
+# 7. Redis sem autenticação
+# 8. Logs expostos via HTTP
+# 9. PHPInfo expondo configurações do servidor
+# 10. Labels vazando credenciais
+# 11. MySQL com SSL desabilitado
+# 12. Múltiplas portas desnecessárias expostas
