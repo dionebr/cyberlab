@@ -20,8 +20,8 @@ require('dotenv').config();
 
 // Import custom middleware
 const { logger, vulnerableLogger } = require('./middleware/logger');
-const { vulnerableErrorHandler } = require('./middleware/errorHandler');
-const { vulnerableHeaders } = require('./middleware/securityHeaders');
+const { vulnerable: vulnerableErrorHandler } = require('./middleware/errorHandler');
+const { disable: vulnerableHeaders } = require('./middleware/securityHeaders');
 
 // Debug das importações
 console.log('🔍 Debug: logger =', typeof logger);
