@@ -129,7 +129,6 @@ logger.logAttackSuccess = (type, payload, result, userIP) => {
 };
 
 // Log queries SQL vulneráveis
-// Log de queries SQL vulneráveis
 const logVulnerableQuery = (query, parameters, ip, user) => {
   logger.warn('VULNERABLE_SQL_EXECUTED', {
     sql_query: query,
@@ -141,8 +140,8 @@ const logVulnerableQuery = (query, parameters, ip, user) => {
     category: 'SQL_INJECTION'
   });
   
-  // Log adicional em arquivo específico
-  sqlLogger.error('SQL_INJECTION_ATTEMPT', {
+  // Log adicional detalhado
+  logger.error('SQL_INJECTION_ATTEMPT', {
     raw_query: query,
     params: parameters,
     ip: ip,
@@ -167,8 +166,8 @@ const logVulnerableCommand = (command, parameters, ip, user) => {
     category: 'COMMAND_INJECTION'
   });
   
-  // Log adicional em arquivo específico
-  commandLogger.error('COMMAND_EXECUTION', {
+  // Log adicional detalhado
+  logger.error('COMMAND_EXECUTION', {
     raw_command: command,
     params: parameters,
     ip: ip,
@@ -297,7 +296,7 @@ module.exports = {
   logVulnerableQuery,
   logVulnerableCommand,
   logAuthBypass: logger.logAuthBypass,
-  clearLogs,
+  clearLogs: logger.clearLogs,
   vulnerableLogger: (req, res, next) => {
     // Log TODAS as requisições com dados sensíveis
     logger.logSensitive('HTTP_REQUEST', {
