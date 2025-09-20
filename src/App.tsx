@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import BuyMeACoffee from "@/components/BuyMeACoffee";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -42,6 +43,7 @@ const App = () => (
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
+                      <BuyMeACoffee />
                   </div>
                 </SidebarProvider>
               </BrowserRouter>
