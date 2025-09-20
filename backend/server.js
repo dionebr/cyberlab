@@ -127,7 +127,7 @@ app.use(morgan('combined', {
 }));
 
 // Headers de segurança DESABILITADOS - VULNERÁVEL
-app.use(securityHeaders.disable); // Nosso middleware que DESABILITA proteções
+app.use(vulnerableHeaders); // Nosso middleware que DESABILITA proteções
 
 // Servir arquivos estáticos sem restrições
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
