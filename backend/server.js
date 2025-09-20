@@ -23,12 +23,6 @@ const { logger, vulnerableLogger } = require('./middleware/logger');
 const { vulnerable: vulnerableErrorHandler } = require('./middleware/errorHandler');
 const { disable: vulnerableHeaders } = require('./middleware/securityHeaders');
 
-// Debug das importações
-console.log('🔍 Debug: logger =', typeof logger);
-console.log('🔍 Debug: vulnerableLogger =', typeof vulnerableLogger);
-console.log('🔍 Debug: vulnerableErrorHandler =', typeof vulnerableErrorHandler);
-console.log('🔍 Debug: vulnerableHeaders =', typeof vulnerableHeaders);
-
 // Import database connection (VULNERÁVEL) - com fallback
 let db = null;
 try {
@@ -200,16 +194,6 @@ app.get('/debug', (req, res) => {
     });
   }
 });
-
-// ============================================
-// ROUTES DA API (VULNERÁVEIS)
-// ============================================
-
-app.use('/api/auth', authRoutes);
-app.use('/api/sql', sqlRoutes);  
-app.use('/api/xss', xssRoutes);
-app.use('/api/cmd', commandRoutes);
-app.use('/api/file', fileRoutes);
 
 // ============================================
 // ERROR HANDLING VULNERÁVEL
