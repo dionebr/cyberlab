@@ -213,7 +213,7 @@ app.use((req, res) => {
 });
 
 // Global error handler que vaza stack traces
-app.use(errorHandler.vulnerable);
+app.use(vulnerableErrorHandler);
 
 // ============================================
 // SERVER STARTUP

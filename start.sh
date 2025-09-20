@@ -109,7 +109,7 @@ start_application() {
     }
     
     # Verificar serviços
-    wait_for_service "http://localhost:5001/api/status" "Backend"
+    wait_for_service "http://localhost:3001/health" "Backend"
     wait_for_service "http://localhost:8080" "Frontend"
     wait_for_service "http://localhost:8081" "phpMyAdmin"
 }
@@ -121,13 +121,13 @@ show_status() {
     echo ""
     echo -e "${BLUE}📱 INTERFACES DISPONÍVEIS:${NC}"
     echo -e "${WHITE}🌐 Frontend:       ${CYAN}http://localhost:8080${NC}"
-    echo -e "${WHITE}⚡ Backend API:    ${CYAN}http://localhost:5001${NC}"
+    echo -e "${WHITE}⚡ Backend API:    ${CYAN}http://localhost:3001${NC}"
     echo -e "${WHITE}🗃️  phpMyAdmin:    ${CYAN}http://localhost:8081${NC}"
     echo -e "${WHITE}💾 Redis Commander: ${CYAN}http://localhost:8082${NC}"
     echo ""
     echo -e "${BLUE}🔗 ENDPOINTS ÚTEIS:${NC}"
-    echo -e "${WHITE}📊 Analytics:      ${CYAN}http://localhost:5001/api/analytics/dashboard${NC}"
-    echo -e "${WHITE}🩺 Status API:     ${CYAN}http://localhost:5001/api/status${NC}"
+    echo -e "${WHITE}📊 Analytics:      ${CYAN}http://localhost:3001/api/analytics/dashboard${NC}"
+    echo -e "${WHITE}🩺 Status API:     ${CYAN}http://localhost:3001/health${NC}"
     echo -e "${WHITE}📋 Docs API:       ${CYAN}http://localhost:5001/api${NC}"
     echo ""
     echo -e "${BLUE}🎯 MÓDULOS VULNERÁVEIS:${NC}"
