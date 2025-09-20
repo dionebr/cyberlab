@@ -8,10 +8,10 @@ services:
       dockerfile: Dockerfile
     container_name: cyberlab-backend
     ports:
-      - "5001:5001"
+      - "3001:3001"
     environment:
       - NODE_ENV=development
-      - PORT=5001
+      - PORT=3001
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USER=vulnerable_user
@@ -35,7 +35,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - VITE_API_URL=http://backend:5001
+      - VITE_API_URL=http://backend:3001
     volumes:
       - .:/app
       - /app/node_modules
