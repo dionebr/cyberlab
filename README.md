@@ -1,4 +1,4 @@
-# 🚀 CyberLab Professional - Break'n'Learn v2.0
+# 🚀 CyberLab
 
 > **Uma plataforma educacional interativa para aprendizado de segurança cibernética através de vulnerabilidades reais em ambiente controlado.**
 
