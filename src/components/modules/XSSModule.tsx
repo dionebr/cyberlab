@@ -48,9 +48,9 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
           actualDisplay = sanitizedMessage;
           
           if (message.includes("<") || message.includes(">")) {
-            educationalNote = "Basic HTML encoding applied. Script tags are escaped, but this protection can sometimes be bypassed with other XSS vectors.";
+            educationalNote = t("xss.basic_html_encoding");
           } else {
-            educationalNote = "Medium level applies basic HTML encoding but may still be vulnerable to attribute-based XSS.";
+            educationalNote = t("xss.medium_html_encoding");
           }
           break;
 
@@ -73,7 +73,7 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
           if (message !== sanitizedMessage) {
             educationalNote = "Advanced sanitization applied: HTML entities encoded and javascript: URLs removed. This significantly reduces XSS risk.";
           } else {
-            educationalNote = "Hard level uses comprehensive input sanitization, making XSS very difficult.";
+            educationalNote = t("xss.hard_sanitization");
           }
           break;
 
@@ -102,7 +102,7 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
         severity: vulnerabilityDetected ? "critical" : "safe",
         educationalNote,
         exploitUsed: vulnerabilityDetected ? "Cross-Site Scripting (XSS)" : "None",
-        prevention: "Use Content Security Policy (CSP), encode output, and validate/sanitize all user input."
+        prevention: t("xss.prevention_csp")
       });
       
       setIsLoading(false);
@@ -149,7 +149,7 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Code className="h-5 w-5" />
-            Message Board System
+            {t("xss.message_board")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -172,7 +172,7 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
               disabled={isLoading || !userMessage.trim()}
               className="w-full bg-warning hover:bg-warning/90"
             >
-              {isLoading ? "Processing..." : t("xss.submit")}
+              {isLoading ? t("xss.processing") : t("xss.submit")}
             </Button>
           </form>
         </CardContent>
@@ -189,7 +189,7 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
           </CardHeader>
           <CardContent>
             <div className="p-4 border border-border rounded-lg bg-muted/50">
-              <h4 className="font-semibold mb-2">Message Preview:</h4>
+              <h4 className="font-semibold mb-2">{t("xss.message_preview")}</h4>
               <div 
                 className="p-3 bg-background border rounded min-h-[60px]"
                 dangerouslySetInnerHTML={{ __html: displayedMessage }}
@@ -205,20 +205,20 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {getSeverityIcon(results.severity)}
-              Security Analysis
+              {t("xss.security_analysis")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Input Comparison */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <h4 className="font-semibold mb-2">Original Input:</h4>
+                <h4 className="font-semibold mb-2">{t("xss.original_input")}</h4>
                 <code className="block p-3 bg-muted rounded text-sm font-mono break-all">
                   {results.original}
                 </code>
               </div>
               <div>
-                <h4 className="font-semibold mb-2">Processed Output:</h4>
+                <h4 className="font-semibold mb-2">{t("xss.processed_output")}</h4>
                 <code className="block p-3 bg-muted rounded text-sm font-mono break-all">
                   {results.sanitized}
                 </code>
@@ -230,7 +230,7 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
               <Alert className={results.vulnerable ? "border-danger bg-danger/10" : "border-success bg-success/10"}>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Educational Note:</strong> {results.educationalNote}
+                  <strong>{t("xss.educational_note")}</strong> {results.educationalNote}
                 </AlertDescription>
               </Alert>
             )}
@@ -239,7 +239,7 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
             <Alert className="border-info bg-info/10">
               <Info className="h-4 w-4" />
               <AlertDescription>
-                <strong>Prevention:</strong> {results.prevention}
+                <strong>{t("xss.prevention")}</strong> {results.prevention}
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -249,37 +249,37 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
       {/* Learning Tips */}
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold mb-3">💡 Try These XSS Payloads:</h3>
+          <h3 className="text-lg font-semibold mb-3">{t("xss.payloads_title")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm font-mono">
             <div className="p-2 bg-background rounded border">
-              <strong>Basic script:</strong><br />
+              <strong>{t("xss.basic_script")}</strong><br />
               <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>Image onerror:</strong><br />
+              <strong>{t("xss.image_onerror")}</strong><br />
               <code>&lt;img src=x onerror=alert('XSS')&gt;</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>JavaScript URL:</strong><br />
+              <strong>{t("xss.javascript_url")}</strong><br />
               <code>&lt;a href="javascript:alert('XSS')"&gt;Click&lt;/a&gt;</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>Event handler:</strong><br />
+              <strong>{t("xss.event_handler")}</strong><br />
               <code>&lt;div onmouseover=alert('XSS')&gt;Hover&lt;/div&gt;</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>SVG payload:</strong><br />
+              <strong>{t("xss.svg_payload")}</strong><br />
               <code>&lt;svg onload=alert('XSS')&gt;</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>Body onload:</strong><br />
+              <strong>{t("xss.body_onload")}</strong><br />
               <code>&lt;body onload=alert('XSS')&gt;</code>
             </div>
           </div>
           
           <div className="mt-4 p-3 bg-warning/10 rounded border border-warning/20">
             <p className="text-sm text-warning-foreground">
-              ⚠️ <strong>Educational Purpose Only:</strong> These payloads are for learning. Never use them on systems you don't own or without explicit permission.
+              {t("xss.educational_purpose")}
             </p>
           </div>
         </CardContent>

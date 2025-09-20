@@ -52,7 +52,7 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
         // Check for path traversal attempts
         if (input.includes("../") || input.includes("..\\")) {
           fileContent = mockFiles["/etc/passwd" as keyof typeof mockFiles] || "File not found";
-          notes.push("🚨 Path traversal attack successful!");
+          notes.push(t("file_inclusion.path_traversal_successful"));
           notes.push("💀 System files exposed - /etc/passwd readable");
           notes.push("🔓 No input validation implemented");
         } else if (input.includes("config")) {
@@ -81,12 +81,12 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
           vulnerability = true;
           severity = "warning";
           fileContent = mockFiles["/etc/passwd" as keyof typeof mockFiles] || "File not found";
-          notes.push("🚨 Filter bypass successful!");
+          notes.push(t("file_inclusion.filter_bypass_successful"));
           notes.push("💡 Used double encoding: ....// → ../");
         } else {
           fileContent = mockFiles[sanitizedInput as keyof typeof mockFiles] || "File not found";
           if (fileContent !== "File not found") {
-            notes.push("✅ File included successfully");
+            notes.push(t("file_inclusion.file_included_successfully"));
           }
         }
         break;
@@ -174,14 +174,14 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
             <FileText className="h-8 w-8 text-primary" />
-            File Inclusion
+            {t("file_inclusion.title")}
           </h1>
           <p className="text-lg text-muted-foreground mt-2">
-            Learn about Local and Remote File Inclusion vulnerabilities
+            {t("file_inclusion.description")}
           </p>
         </div>
         <Badge variant="outline" className="text-sm">
-          Level: {difficulty}
+          Level: {t(`difficulty.${difficulty}`)}
         </Badge>
       </div>
 
@@ -190,28 +190,28 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            File Viewer Application
+            {t("file_inclusion.file_viewer")}
           </CardTitle>
           <CardDescription>
-            Enter a filename to include and display its contents
+            {t("file_inclusion.file_viewer_desc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="file-input" className="block text-sm font-medium mb-2">
-                File to include:
+                {t("file_inclusion.file_to_include")}
               </label>
               <Input
                 id="file-input"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Enter filename (e.g., home.php, ../../../etc/passwd)"
+                placeholder={t("file_inclusion.file_placeholder")}
                 className="w-full"
               />
             </div>
             <Button type="submit" disabled={isLoading} className="w-full">
-              {isLoading ? "Loading..." : "Include File"}
+              {isLoading ? t("file_inclusion.loading") : t("file_inclusion.include_file")}
             </Button>
           </form>
         </CardContent>
@@ -223,13 +223,13 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {getSeverityIcon(results.severity)}
-              File Inclusion Analysis
+              {t("file_inclusion.analysis")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* File Request */}
             <div>
-              <h4 className="font-semibold text-foreground mb-2">Requested File:</h4>
+              <h4 className="font-semibold text-foreground mb-2">{t("file_inclusion.requested_file")}</h4>
               <code className="block bg-muted p-3 rounded-md text-sm font-mono">
                 include("{results.fileRequest}")
               </code>
@@ -237,7 +237,7 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
 
             {/* File Content */}
             <div>
-              <h4 className="font-semibold text-foreground mb-2">File Contents:</h4>
+              <h4 className="font-semibold text-foreground mb-2">{t("file_inclusion.file_contents")}</h4>
               <pre className="bg-muted p-3 rounded-md text-sm font-mono whitespace-pre-wrap max-h-40 overflow-y-auto">
                 {results.fileContent}
               </pre>
@@ -245,7 +245,7 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
 
             {/* Security Analysis */}
             <div>
-              <h4 className="font-semibold text-foreground mb-2">Security Analysis:</h4>
+              <h4 className="font-semibold text-foreground mb-2">{t("file_inclusion.security_analysis")}</h4>
               <div className="space-y-2">
                 {results.notes.map((note, index) => (
                   <div key={index} className="flex items-start gap-2">
@@ -260,7 +260,7 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
             <div>
               <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                 <Shield className="h-4 w-4 text-success" />
-                Prevention Methods:
+                {t("file_inclusion.prevention_methods")}
               </h4>
               <div className="space-y-2">
                 {results.prevention.map((tip, index) => (
@@ -280,13 +280,13 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-warning" />
-            Common File Inclusion Payloads
+            {t("file_inclusion.common_payloads")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-semibold mb-2">Path Traversal (LFI):</h4>
+              <h4 className="font-semibold mb-2">{t("file_inclusion.path_traversal")}</h4>
               <div className="space-y-1 text-sm font-mono bg-muted p-3 rounded-md">
                 <div>../../../etc/passwd</div>
                 <div>....//....//etc/passwd</div>
@@ -295,7 +295,7 @@ export const FileInclusionModule = ({ difficulty }: FileInclusionModuleProps) =>
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">PHP Wrappers:</h4>
+              <h4 className="font-semibold mb-2">{t("file_inclusion.php_wrappers")}</h4>
               <div className="space-y-1 text-sm font-mono bg-muted p-3 rounded-md">
                 <div>php://filter/read=convert.base64-encode/resource=config</div>
                 <div>data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7Pz4=</div>

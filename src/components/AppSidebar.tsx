@@ -144,7 +144,7 @@ const learnCategories = [
   }
 ];
 
-// Static names for vulnerability modules - always in English
+// Static names for vulnerability modules - always in English (technical terms)
 const moduleNames = {
   "sql-injection": "SQL Injection",
   "sql-blind": "SQL Injection (Blind)",

@@ -52,7 +52,7 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
             response = "User found: John Doe";
             timing = 150;
             notes = [
-              "Boolean-based blind injection successful!",
+              t("sql_blind.boolean_injection_successful"),
               "Application returns different responses for true/false conditions",
               "Data can be extracted bit by bit using binary search",
               "Try: 1' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin')='a'--"
@@ -66,7 +66,7 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
             timing = 145;
             notes = [
               "False condition detected - no user found",
-              "This confirms boolean-based blind injection vulnerability",
+              t("sql_blind.boolean_vulnerability_confirmed"),
               "Compare responses between true and false conditions"
             ];
           } else {
@@ -83,12 +83,12 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
           if (input.includes("SLEEP(") || input.includes("WAITFOR DELAY") || input.includes("pg_sleep(")) {
             vulnerability = true;
             severity = "critical";
-            technique = "Time-based Blind";
+            technique = t("sql_blind.time_based_blind_technique");
             query = `SELECT * FROM users WHERE id = '${input}'`;
             response = "Query executed";
             timing = 5000; // 5 second delay
             notes = [
-              "Time-based blind injection successful!",
+              t("sql_blind.time_injection_successful"),
               "Application delays response when condition is true",
               "Data extraction possible through timing analysis",
               "Example: 1' AND IF((SELECT SUBSTRING(password,1,1) FROM users WHERE username='admin')='a',SLEEP(5),0)--"
@@ -96,20 +96,20 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
           } else if (input.includes("' AND ")) {
             vulnerability = true;
             severity = "high";
-            technique = "Boolean-based (Limited)";
+            technique = t("sql_blind.boolean_limited_technique");
             query = `SELECT * FROM users WHERE id = '${input}'`;
             response = "Query executed";
             timing = 152;
             notes = [
               "Boolean conditions work but responses are normalized",
-              "Time-based techniques may be more effective",
+              t("sql_blind.time_techniques_effective"),
               "Try: ' AND SLEEP(5)-- or ' WAITFOR DELAY '00:00:05'--"
             ];
           } else {
             query = `SELECT * FROM users WHERE id = '${input}'`;
             response = "Query executed";
             timing = 149;
-            notes = ["Try time-based payloads: ' AND SLEEP(5)-- or boolean conditions"];
+            notes = [t("sql_blind.try_time_based_payloads")];
           }
           break;
 
@@ -128,8 +128,8 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
           ];
           prevention = [
             "✓ Uses prepared statements",
-            "✓ Input validation implemented",
-            "✓ Proper error handling"
+            t("sql_blind.input_validation_implemented"),
+            t("sql_blind.proper_error_handling")
           ];
           break;
       }
@@ -137,10 +137,10 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
       if (vulnerability) {
         prevention = [
           "Use prepared statements (PDO/parameterized queries)",
-          "Implement proper input validation",
-          "Add query timeouts to prevent time-based attacks",
+          t("sql_blind.implement_input_validation"),
+          t("sql_blind.add_query_timeouts"),
           "Use stored procedures where appropriate",
-          "Implement proper error handling",
+          t("sql_blind.implement_error_handling"),
           "Apply principle of least privilege for database users"
         ];
       }
@@ -185,29 +185,30 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Database className="h-5 w-5 text-accent" />
-            <CardTitle>SQL Injection (Blind)</CardTitle>
+            <CardTitle>{t("sql_blind.title")}</CardTitle>
             <Badge variant={difficulty === 'impossible' ? 'default' : 'destructive'}>
-              {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+              {t(`difficulty.${difficulty}`)}
             </Badge>
           </div>
           <CardDescription>
-            {difficulty === 'low' && "Boolean-based blind injection - responses differ for true/false"}
-            {difficulty === 'medium' && "Time-based blind injection - extract data through timing"}
-            {difficulty === 'high' && "Advanced blind techniques required"}
-            {difficulty === 'impossible' && "Prepared statements prevent all injection attempts"}
+            {t("sql_blind.description")}
+            {difficulty === 'low' && t("sql_blind.boolean_blind_description")}
+            {difficulty === 'medium' && t("sql_blind.time_blind_description")}
+            {difficulty === 'high' && t("sql_blind.advanced_blind_description")}
+            {difficulty === 'impossible' && " - Prepared statements"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="userId" className="block text-sm font-medium mb-2">
-                User ID
+                {t("sql_blind.user_id")}
               </label>
               <Input
                 id="userId"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder="Enter user ID to search..."
+                placeholder={t("sql.placeholder")}
                 className="font-mono"
               />
             </div>
@@ -216,7 +217,7 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
               disabled={isLoading || !userId.trim()}
               className="w-full"
             >
-              {isLoading ? "Querying..." : "Search User"}
+              {isLoading ? t("sql_blind.querying") : t("sql_blind.search_user")}
             </Button>
           </form>
 
@@ -226,26 +227,26 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
                 <div className="flex items-center gap-2">
                   {getSeverityIcon(results.severity)}
                   <span className="font-semibold">
-                    Analysis Results - Technique: {results.technique}
+                    {t("sql_blind.analysis_results")} {results.technique}
                   </span>
                 </div>
                 <AlertDescription className="mt-2">
                   <div className="space-y-2">
                     <div>
-                      <strong>Query:</strong>
+                      <strong>{t("sql_blind.query")}</strong>
                       <code className="block mt-1 p-2 bg-muted rounded text-sm">{results.query}</code>
                     </div>
                     <div>
-                      <strong>Response:</strong>
+                      <strong>{t("sql_blind.response")}</strong>
                       <code className="block mt-1 p-2 bg-muted rounded text-sm">{results.response}</code>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
-                      <strong>Response Time:</strong>
+                      <strong>{t("sql_blind.response_time")}</strong>
                       <span className={`font-mono ${results.timing > 1000 ? 'text-danger' : 'text-foreground'}`}>
                         {results.timing}ms
                       </span>
-                      {results.timing > 1000 && <span className="text-danger">⚠️ Suspicious delay!</span>}
+                      {results.timing > 1000 && <span className="text-danger">{t("sql_blind.suspicious_delay")}</span>}
                     </div>
                   </div>
                 </AlertDescription>
@@ -256,7 +257,7 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" />
-                      Analysis Notes
+                      {t("sql_blind.analysis_notes")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -276,7 +277,7 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
                         <CheckCircle className="h-4 w-4" />
-                        Prevention Measures
+                        {t("sql_blind.prevention_measures")}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -298,23 +299,23 @@ export const SQLBlindModule = ({ difficulty }: SQLBlindModuleProps) => {
           {/* Learning Examples */}
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-3">🎯 Blind SQL Injection Payloads:</h3>
+              <h3 className="text-lg font-semibold mb-3">{t("sql_blind.payloads_title")}</h3>
               <div className="grid grid-cols-1 gap-3 text-sm font-mono">
                 <div className="p-2 bg-background rounded border">
-                  <strong>Boolean-based:</strong><br />
+                  <strong>{t("sql_blind.boolean_based")}</strong><br />
                   <code>1' AND '1'='1'-- (True condition)</code><br />
                   <code>1' AND '1'='2'-- (False condition)</code>
                 </div>
                 <div className="p-2 bg-background rounded border">
-                  <strong>Time-based (MySQL):</strong><br />
+                  <strong>{t("sql_blind.time_based_mysql")}</strong><br />
                   <code>1' AND SLEEP(5)--</code>
                 </div>
                 <div className="p-2 bg-background rounded border">
-                  <strong>Time-based (SQL Server):</strong><br />
+                  <strong>{t("sql_blind.time_based_sqlserver")}</strong><br />
                   <code>1'; WAITFOR DELAY '00:00:05'--</code>
                 </div>
                 <div className="p-2 bg-background rounded border">
-                  <strong>Data extraction:</strong><br />
+                  <strong>{t("sql_blind.data_extraction")}</strong><br />
                   <code>1' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE id=1)='a'--</code>
                 </div>
               </div>

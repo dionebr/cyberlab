@@ -137,7 +137,7 @@ export const WeakSessionModule = ({ difficulty }: WeakSessionModuleProps) => {
             "Implement proper session validation",
             "Add session binding to client characteristics"
           ];
-          predictedNext = ["Requires pattern analysis", "Hash collision possible", "Time-based prediction"];
+          predictedNext = [t("weak_session.pattern_analysis"), t("weak_session.hash_collision"), t("weak_session.time_prediction")];
           break;
 
         case 'impossible':
@@ -183,22 +183,19 @@ export const WeakSessionModule = ({ difficulty }: WeakSessionModuleProps) => {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-warning" />
-            <CardTitle>Weak Session IDs</CardTitle>
+            <CardTitle>{t("weak_session.title")}</CardTitle>
             <Badge variant={difficulty === 'impossible' ? 'default' : 'destructive'}>
-              {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+              {t(`difficulty.${difficulty}`)}
             </Badge>
           </div>
           <CardDescription>
-            {difficulty === 'low' && "Sequential session IDs - extremely predictable"}
-            {difficulty === 'medium' && "Timestamp-based session IDs - predictable patterns"}
-            {difficulty === 'high' && "Hashed timestamp - still vulnerable to analysis"}
-            {difficulty === 'impossible' && "Cryptographically secure session generation"}
+            {t("weak_session.description")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Current Session ID</label>
+              <label className="block text-sm font-medium mb-2">{t("weak_session.generated_id")}</label>
               <div className="flex gap-2">
                 <Input
                   value={currentSessionId}
@@ -212,17 +209,17 @@ export const WeakSessionModule = ({ difficulty }: WeakSessionModuleProps) => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-2">Predict Next Session</label>
+              <label className="block text-sm font-medium mb-2">{t("weak_session.generate_session")}</label>
               <div className="flex gap-2">
                 <Input
                   value={predictedSessionId}
                   onChange={(e) => setPredictedSessionId(e.target.value)}
-                  placeholder="Enter your prediction..."
+                  placeholder={t("weak_session.session_desc")}
                   className="font-mono text-sm"
                 />
                 <Button onClick={handleSessionPrediction} disabled={isLoading}>
                   {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
-                  Analyze
+                  {t("weak_session.session_analysis")}
                 </Button>
               </div>
             </div>
@@ -250,7 +247,7 @@ export const WeakSessionModule = ({ difficulty }: WeakSessionModuleProps) => {
                 <div className="flex items-center gap-2">
                   {results.vulnerability ? <XCircle className="h-4 w-4" /> : <CheckCircle className="h-4 w-4" />}
                   <span className="font-semibold">
-                    Analysis Results - Severity: {results.severity}
+                    {t("weak_session.session_analysis")} - {t("weak_session.predictability")}: {results.severity}
                   </span>
                 </div>
                 <AlertDescription className="mt-2">
@@ -276,7 +273,7 @@ export const WeakSessionModule = ({ difficulty }: WeakSessionModuleProps) => {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" />
-                      Vulnerabilities Found
+                      {t("weak_session.session_attacks")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -295,7 +292,7 @@ export const WeakSessionModule = ({ difficulty }: WeakSessionModuleProps) => {
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />
-                      Prevention Measures
+                      {t("auth_bypass.prevention_methods")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>

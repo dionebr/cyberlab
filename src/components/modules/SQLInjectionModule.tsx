@@ -47,7 +47,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
                 data: mockDatabase,
                 vulnerable: true,
                 severity: "critical",
-                educationalNote: "SQL injection successful! The query returned all users because '1'='1' is always true, bypassing the WHERE condition.",
+                educationalNote: t("sql_injection.sqli_successful"),
                 exploitUsed: "Authentication Bypass",
                 prevention: "Use parameterized queries or prepared statements to prevent SQL injection."
               });
@@ -63,7 +63,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
                 ],
                 vulnerable: true,
                 severity: "critical",
-                educationalNote: "UNION-based SQL injection successful! Additional data was retrieved from the database.",
+                educationalNote: t("sql_injection.union_sqli_successful"),
                 exploitUsed: "UNION-based injection",
                 prevention: "Validate input and use parameterized queries."
               });
@@ -81,7 +81,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
           if (input.includes("'")) {
             educationalNote = "Basic sanitization applied: single quotes escaped. However, this protection can still be bypassed with other techniques.";
           } else {
-            educationalNote = "Medium level applies basic sanitization but may still be vulnerable to other SQL injection techniques.";
+            educationalNote = t("sql_injection.medium_sanitization");
           }
           break;
 
@@ -92,7 +92,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
           if (input !== sanitizedInput) {
             educationalNote = "Advanced sanitization applied: special characters removed. This significantly reduces SQL injection risk.";
           } else {
-            educationalNote = "Hard level uses advanced input sanitization, making SQL injection very difficult.";
+            educationalNote = t("sql_injection.hard_sanitization");
           }
           break;
 
@@ -161,7 +161,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5" />
-            User Lookup System
+            {t("sql_injection.user_lookup")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -184,7 +184,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
               disabled={isLoading || !userInput.trim()}
               className="w-full bg-danger hover:bg-danger/90"
             >
-              {isLoading ? "Querying..." : t("sql.submit")}
+              {isLoading ? t("sql_injection.querying") : t("sql.submit")}
             </Button>
           </form>
         </CardContent>
@@ -203,7 +203,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
             <CardContent className="space-y-4">
               {/* Query Display */}
               <div>
-                <h4 className="font-semibold mb-2">Executed Query:</h4>
+                <h4 className="font-semibold mb-2">{t("sql_injection.executed_query")}</h4>
                 <code className="block p-3 bg-muted rounded text-sm font-mono">
                   {results.query}
                 </code>
@@ -212,7 +212,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
               {/* Data Results */}
               {results.data.length > 0 ? (
                 <div>
-                  <h4 className="font-semibold mb-2">Retrieved Data:</h4>
+                  <h4 className="font-semibold mb-2">{t("sql_injection.retrieved_data")}</h4>
                   <div className="overflow-x-auto">
                     <table className="w-full border border-border rounded">
                       <thead className="bg-muted">
@@ -243,7 +243,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
               ) : (
                 <Alert>
                   <Info className="h-4 w-4" />
-                  <AlertDescription>No results found for the given input.</AlertDescription>
+                  <AlertDescription>{t("sql_injection.no_results")}</AlertDescription>
                 </Alert>
               )}
 
@@ -252,7 +252,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
                 <Alert className={results.vulnerable ? "border-danger bg-danger/10" : "border-success bg-success/10"}>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Educational Note:</strong> {results.educationalNote}
+                    <strong>{t("sql_injection.educational_note")}</strong> {results.educationalNote}
                   </AlertDescription>
                 </Alert>
               )}
@@ -261,7 +261,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
               <Alert className="border-info bg-info/10">
                 <Info className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Prevention:</strong> {results.prevention}
+                  <strong>{t("sql_injection.prevention")}</strong> {results.prevention}
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -272,22 +272,22 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
       {/* Learning Tips */}
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold mb-3">💡 Try These Payloads:</h3>
+          <h3 className="text-lg font-semibold mb-3">{t("sql_injection.payloads_title")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm font-mono">
             <div className="p-2 bg-background rounded border">
-              <strong>Basic bypass:</strong><br />
+              <strong>{t("sql_injection.basic_bypass")}</strong><br />
               <code>' OR '1'='1</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>Comment injection:</strong><br />
+              <strong>{t("sql_injection.comment_injection")}</strong><br />
               <code>' OR '1'='1' --</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>UNION attack:</strong><br />
+              <strong>{t("sql_injection.union_attack")}</strong><br />
               <code>' UNION SELECT * FROM users--</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>Boolean-based:</strong><br />
+              <strong>{t("sql_injection.boolean_based")}</strong><br />
               <code>' AND '1'='1</code>
             </div>
           </div>

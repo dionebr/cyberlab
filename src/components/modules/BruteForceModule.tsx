@@ -71,7 +71,7 @@ export const BruteForceModule = ({ difficulty }: BruteForceModuleProps) => {
             success = true;
             foundPassword = password;
             severity = "danger";
-            notes.push("🚨 Brute force attack successful!");
+            notes.push(t("brute_force.attack_successful"));
             notes.push(`💀 Password '${password}' cracked in ${attempts} attempts`);
             notes.push("🔓 No rate limiting or account lockout");
             break;
@@ -99,7 +99,7 @@ export const BruteForceModule = ({ difficulty }: BruteForceModuleProps) => {
             success = true;
             foundPassword = password;
             severity = "warning";
-            notes.push("🚨 Brute force successful despite rate limiting!");
+            notes.push(t("brute_force.attack_successful_rate_limited"));
             notes.push(`⚠️ Password cracked in ${attempts} attempts with delays`);
             notes.push("🐌 Rate limiting slows but doesn't prevent attack");
             break;
@@ -208,16 +208,16 @@ export const BruteForceModule = ({ difficulty }: BruteForceModuleProps) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+                    <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
             <Zap className="h-8 w-8 text-primary" />
-            Brute Force Attack
+            {t("brute_force.title")}
           </h1>
           <p className="text-lg text-muted-foreground mt-2">
-            Learn about brute force attacks and rate limiting protections
+            {t("brute_force.description")}
           </p>
         </div>
         <Badge variant="outline" className="text-sm">
-          Level: {difficulty}
+          Level: {t(`difficulty.${difficulty}`)}
         </Badge>
       </div>
 
@@ -266,7 +266,7 @@ export const BruteForceModule = ({ difficulty }: BruteForceModuleProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Attack Progress
+              {t("brute_force.attack_progress")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -280,7 +280,7 @@ export const BruteForceModule = ({ difficulty }: BruteForceModuleProps) => {
             
             {currentPassword && (
               <div>
-                <h4 className="font-semibold mb-2">Current Password Attempt:</h4>
+                <h4 className="font-semibold mb-2">{t("brute_force.current_attempt")}</h4>
                 <code className="block bg-muted p-2 rounded font-mono">
                   {currentPassword}
                 </code>
@@ -296,24 +296,24 @@ export const BruteForceModule = ({ difficulty }: BruteForceModuleProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {getSeverityIcon(results.severity)}
-              Attack Results
+              {t("brute_force.attack_results")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Status */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 rounded-lg border">
-                <div className="text-sm text-muted-foreground">Status</div>
+                <div className="text-sm text-muted-foreground">{t("brute_force.attack_status")}</div>
                 <div className="font-semibold">
                   {results.success ? "✅ Success" : results.blocked ? "🛡️ Blocked" : "❌ Failed"}
                 </div>
               </div>
               <div className="p-4 rounded-lg border">
-                <div className="text-sm text-muted-foreground">Attempts</div>
+                <div className="text-sm text-muted-foreground">{t("brute_force.total_attempts")}</div>
                 <div className="font-semibold">{results.attempts}</div>
               </div>
               <div className="p-4 rounded-lg border">
-                <div className="text-sm text-muted-foreground">Time Delay</div>
+                <div className="text-sm text-muted-foreground">{t("brute_force.time_taken")}</div>
                 <div className="font-semibold">{results.timeDelay}ms</div>
               </div>
             </div>
@@ -321,7 +321,7 @@ export const BruteForceModule = ({ difficulty }: BruteForceModuleProps) => {
             {/* Found Credentials */}
             {results.success && (
               <div>
-                <h4 className="font-semibold text-foreground mb-2">Compromised Credentials:</h4>
+                <h4 className="font-semibold text-foreground mb-2">{t("brute_force.found_password")}</h4>
                 <div className="bg-danger/10 border border-danger/20 p-3 rounded-md">
                   <div className="font-mono text-sm">
                     Username: {results.username}<br/>
@@ -348,7 +348,7 @@ export const BruteForceModule = ({ difficulty }: BruteForceModuleProps) => {
             <div>
               <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                 <Shield className="h-4 w-4 text-success" />
-                Prevention Methods:
+                {t("auth_bypass.prevention_methods")}
               </h4>
               <div className="space-y-2">
                 {results.prevention.map((tip, index) => (
@@ -368,7 +368,7 @@ export const BruteForceModule = ({ difficulty }: BruteForceModuleProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Eye className="h-5 w-5 text-warning" />
-            Common Password Wordlist
+            {t("brute_force.common_passwords")}
           </CardTitle>
         </CardHeader>
         <CardContent>

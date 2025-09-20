@@ -60,7 +60,7 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
           bypassUsed = "SQL Injection";
           severity = "danger";
           sessionData = { username: "admin", role: "administrator" };
-          notes.push("🚨 SQL Injection successful!");
+          notes.push(t("auth_bypass.sql_injection_successful"));
           notes.push("💀 Authentication bypassed using malicious SQL");
           notes.push("🔓 Admin access granted without valid credentials");
         } else {
@@ -113,7 +113,7 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
           bypassUsed = "Case Sensitivity Bypass";
           severity = "warning";
           sessionData = { username: "admin", role: "administrator" };
-          notes.push("🚨 Case sensitivity bypass successful!");
+          notes.push(t("auth_bypass.case_sensitivity_bypass"));
           notes.push("⚠️ Username validation is case-insensitive");
         } else if (user.includes("\\") || user.includes("%")) {
           notes.push("🛡️ Encoding attack attempt detected");
@@ -141,7 +141,7 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
             authenticated = true;
             sessionData = foundUser;
             severity = "success";
-            notes.push("✅ Secure authentication successful");
+            notes.push(t("auth_bypass.secure_auth_successful"));
             notes.push("🛡️ All security checks passed");
           } else {
             notes.push("❌ Invalid credentials - secure validation");
@@ -203,14 +203,14 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
             <Lock className="h-8 w-8 text-primary" />
-            Authentication Bypass
+            {t("auth_bypass.title")}
           </h1>
           <p className="text-lg text-muted-foreground mt-2">
-            Learn about authentication vulnerabilities and bypass techniques
+            {t("auth_bypass.description")}
           </p>
         </div>
         <Badge variant="outline" className="text-sm">
-          Level: {difficulty}
+          Level: {t(`difficulty.${difficulty}`)}
         </Badge>
       </div>
 
@@ -219,41 +219,41 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            Secure Admin Login
+            {t("auth_bypass.login_system")}
           </CardTitle>
           <CardDescription>
-            Enter your credentials to access the admin panel
+            {t("auth_bypass.login_desc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-medium mb-2">
-                Username:
+                {t("auth_bypass.username")}:
               </label>
               <Input
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter username"
+                placeholder={t("auth_bypass.username")}
                 className="w-full"
               />
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium mb-2">
-                Password:
+                {t("auth_bypass.password")}:
               </label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
+                placeholder={t("auth_bypass.password")}
                 className="w-full"
               />
             </div>
             <Button type="submit" disabled={isLoading} className="w-full">
-              {isLoading ? "Authenticating..." : "Login"}
+              {isLoading ? t("auth_bypass.logging_in") : t("auth_bypass.login")}
             </Button>
           </form>
         </CardContent>
@@ -265,7 +265,7 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {getSeverityIcon(results.severity)}
-              Authentication Result
+              {t("auth_bypass.auth_analysis")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -274,12 +274,12 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
               {results.authenticated ? (
                 <>
                   <CheckCircle className="h-6 w-6 text-success" />
-                  <span className="font-semibold text-success">Authentication Successful</span>
+                  <span className="font-semibold text-success">{t("auth_bypass.auth_result")} ✅</span>
                 </>
               ) : (
                 <>
                   <XCircle className="h-6 w-6 text-danger" />
-                  <span className="font-semibold text-danger">Authentication Failed</span>
+                  <span className="font-semibold text-danger">{t("auth_bypass.auth_result")} ❌</span>
                 </>
               )}
             </div>
@@ -297,7 +297,7 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
             {/* Session Data */}
             {results.sessionData && (
               <div>
-                <h4 className="font-semibold text-foreground mb-2">Session Information:</h4>
+                <h4 className="font-semibold text-foreground mb-2">{t("auth_bypass.session_info")}</h4>
                 <div className="bg-muted p-3 rounded-md">
                   <pre className="text-sm font-mono">
                     {JSON.stringify(results.sessionData, null, 2)}
@@ -308,7 +308,7 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
 
             {/* Security Analysis */}
             <div>
-              <h4 className="font-semibold text-foreground mb-2">Security Analysis:</h4>
+              <h4 className="font-semibold text-foreground mb-2">{t("auth_bypass.security_analysis")}</h4>
               <div className="space-y-2">
                 {results.notes.map((note, index) => (
                   <div key={index} className="flex items-start gap-2">
@@ -323,7 +323,7 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
             <div>
               <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                 <Shield className="h-4 w-4 text-success" />
-                Prevention Methods:
+                {t("auth_bypass.prevention_methods")}
               </h4>
               <div className="space-y-2">
                 {results.prevention.map((tip, index) => (
@@ -343,13 +343,13 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Key className="h-5 w-5 text-warning" />
-            Common Authentication Bypass Techniques
+            {t("auth_bypass.common_bypasses")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-semibold mb-2">SQL Injection:</h4>
+              <h4 className="font-semibold mb-2">{t("auth_bypass.sql_injection")}</h4>
               <div className="space-y-1 text-sm font-mono bg-muted p-3 rounded-md">
                 <div>' OR '1'='1</div>
                 <div>' OR 1=1--</div>
@@ -358,7 +358,7 @@ export const AuthBypassModule = ({ difficulty }: AuthBypassModuleProps) => {
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Logic Flaws:</h4>
+              <h4 className="font-semibold mb-2">{t("auth_bypass.logic_flaws")}</h4>
               <div className="space-y-1 text-sm bg-muted p-3 rounded-md">
                 <div>• Empty password bypass</div>
                 <div>• Case sensitivity issues</div>

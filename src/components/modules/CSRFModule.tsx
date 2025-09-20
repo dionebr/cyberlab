@@ -120,8 +120,8 @@ export const CSRFModule = ({ difficulty }: CSRFModuleProps) => {
           <Shield className="h-8 w-8 text-info" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">CSRF Protection</h1>
-          <p className="text-muted-foreground">Learn about Cross-Site Request Forgery attacks and defenses.</p>
+          <h1 className="text-3xl font-bold">{t("csrf.title")}</h1>
+          <p className="text-muted-foreground">{t("csrf.description")}</p>
           <Badge variant="outline" className="mt-2">
             Level: {t(`difficulty.${difficulty}`)}
           </Badge>
@@ -133,34 +133,34 @@ export const CSRFModule = ({ difficulty }: CSRFModuleProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            Profile Update Form
+            {t("csrf.profile_update")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium mb-2">
-                Email Address
+                {t("csrf.email_address")}
               </label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address..."
+                placeholder={t("csrf.email_placeholder")}
                 required
               />
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium mb-2">
-                New Password
+                {t("csrf.new_password")}
               </label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter new password..."
+                placeholder={t("csrf.password_placeholder")}
                 required
               />
             </div>
@@ -169,7 +169,7 @@ export const CSRFModule = ({ difficulty }: CSRFModuleProps) => {
             {(difficulty === 'medium' || difficulty === 'high') && (
               <div className="p-3 bg-muted rounded border">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">CSRF Token:</span>
+                  <span className="text-sm font-medium">{t("csrf.csrf_token")}</span>
                   <Button
                     type="button"
                     variant="ghost"
@@ -190,7 +190,7 @@ export const CSRFModule = ({ difficulty }: CSRFModuleProps) => {
               disabled={isLoading || !email.trim() || !password.trim()}
               className="w-full bg-info hover:bg-info/90"
             >
-              {isLoading ? "Updating..." : "Update Profile"}
+              {isLoading ? t("csrf.updating") : t("csrf.update_profile")}
             </Button>
           </form>
         </CardContent>
@@ -203,13 +203,13 @@ export const CSRFModule = ({ difficulty }: CSRFModuleProps) => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 {getSeverityIcon(results.severity)}
-                Form Analysis
+                {t("csrf.form_analysis")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Generated Form */}
               <div>
-                <h4 className="font-semibold mb-2">Generated Form HTML:</h4>
+                <h4 className="font-semibold mb-2">{t("csrf.generated_form")}</h4>
                 <Textarea
                   value={results.formHtml}
                   readOnly
@@ -221,7 +221,7 @@ export const CSRFModule = ({ difficulty }: CSRFModuleProps) => {
               <div>
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
                   <AlertTriangle className="h-4 w-4 text-danger" />
-                  Potential CSRF Attack:
+                  {t("csrf.csrf_attack")}
                 </h4>
                 <Textarea
                   value={results.maliciousHtml}
@@ -235,7 +235,7 @@ export const CSRFModule = ({ difficulty }: CSRFModuleProps) => {
                 <Alert className={results.vulnerable ? "border-danger bg-danger/10" : "border-success bg-success/10"}>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Security Analysis:</strong> {results.educationalNote}
+                    <strong>{t("csrf.security_analysis")}</strong> {results.educationalNote}
                   </AlertDescription>
                 </Alert>
               )}
@@ -255,23 +255,23 @@ export const CSRFModule = ({ difficulty }: CSRFModuleProps) => {
       {/* Learning Tips */}
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold mb-3">🛡️ CSRF Protection Methods:</h3>
+          <h3 className="text-lg font-semibold mb-3">{t("csrf.protection_methods")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="p-3 bg-background rounded border">
-              <strong className="text-success">✓ Anti-CSRF Tokens</strong><br />
-              Include unique, unpredictable tokens in forms
+              <strong className="text-success">{t("csrf.anti_csrf_tokens")}</strong><br />
+              {t("csrf.anti_csrf_desc")}
             </div>
             <div className="p-3 bg-background rounded border">
-              <strong className="text-success">✓ SameSite Cookies</strong><br />
-              Prevent cookies from being sent in cross-site requests
+              <strong className="text-success">{t("csrf.samesite_cookies")}</strong><br />
+              {t("csrf.samesite_desc")}
             </div>
             <div className="p-3 bg-background rounded border">
-              <strong className="text-success">✓ Referrer Validation</strong><br />
-              Check that requests come from expected origins
+              <strong className="text-success">{t("csrf.referrer_validation")}</strong><br />
+              {t("csrf.referrer_desc")}
             </div>
             <div className="p-3 bg-background rounded border">
-              <strong className="text-success">✓ Double Submit Pattern</strong><br />
-              Send token in both cookie and form field
+              <strong className="text-success">{t("csrf.double_submit")}</strong><br />
+              {t("csrf.double_submit_desc")}
             </div>
           </div>
         </CardContent>

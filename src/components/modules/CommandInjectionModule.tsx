@@ -38,7 +38,7 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
                 output: `PING ${input.split(';')[0]} (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.123ms\n\n--- Command Injection Detected ---\nroot:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin`,
                 vulnerable: true,
                 severity: "critical",
-                educationalNote: "Command injection successful! The semicolon allowed execution of additional commands, exposing sensitive system files.",
+                educationalNote: t("command_injection.semicolon_successful"),
                 exploitUsed: "Command Chaining (;)",
                 prevention: "Use parameterized commands and input validation."
               });
@@ -51,7 +51,7 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
                 output: `PING ${input.split('&&')[0]} (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.156ms\n\nroot`,
                 vulnerable: true,
                 severity: "critical",
-                educationalNote: "Command injection via && operator successful! This reveals the current user context.",
+                educationalNote: t("command_injection.and_operator_successful"),
                 exploitUsed: "Logical AND (&&)",
                 prevention: "Implement strict input validation and use safe command execution methods."
               });
@@ -87,7 +87,7 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
           if (input !== sanitizedInput) {
             educationalNote = "Medium level filters ; and & characters, but other operators like || may work.";
           } else {
-            educationalNote = "Medium level applies basic filtering. Try alternative operators: ||, \`, $(), etc.";
+            educationalNote = t("command_injection.medium_filtering");
           }
           break;
 
@@ -186,8 +186,8 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
           <Terminal className="h-8 w-8 text-accent" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Command Injection</h1>
-          <p className="text-muted-foreground">Learn about command injection vulnerabilities in web applications.</p>
+          <h1 className="text-3xl font-bold">{t("command_injection.title")}</h1>
+          <p className="text-muted-foreground">{t("command_injection.description")}</p>
           <Badge variant="outline" className="mt-2">
             Level: {t(`difficulty.${difficulty}`)}
           </Badge>
@@ -199,21 +199,21 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Terminal className="h-5 w-5" />
-            Network Ping Utility
+            {t("command_injection.network_ping")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="host" className="block text-sm font-medium mb-2">
-                Host/IP Address
+                {t("command_injection.host_ip")}
               </label>
               <Input
                 id="host"
                 type="text"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Enter host or IP address to ping..."
+                placeholder={t("command_injection.host_placeholder")}
                 className="font-mono"
               />
             </div>
@@ -222,7 +222,7 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
               disabled={isLoading || !userInput.trim()}
               className="w-full bg-accent hover:bg-accent/90"
             >
-              {isLoading ? "Executing..." : "Execute Ping"}
+              {isLoading ? t("command_injection.executing") : t("command_injection.execute_ping")}
             </Button>
           </form>
         </CardContent>
@@ -235,13 +235,13 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 {getSeverityIcon(results.severity)}
-                Command Results
+                {t("command_injection.command_results")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Command Display */}
               <div>
-                <h4 className="font-semibold mb-2">Executed Command:</h4>
+                <h4 className="font-semibold mb-2">{t("command_injection.executed_command")}</h4>
                 <code className="block p-3 bg-muted rounded text-sm font-mono">
                   {results.command}
                 </code>
@@ -249,7 +249,7 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
 
               {/* Output */}
               <div>
-                <h4 className="font-semibold mb-2">Command Output:</h4>
+                <h4 className="font-semibold mb-2">{t("command_injection.command_output")}</h4>
                 <pre className="p-3 bg-muted rounded text-sm font-mono whitespace-pre-wrap">
                   {results.output}
                 </pre>
@@ -280,22 +280,22 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
       {/* Learning Tips */}
       <Card className="border-primary/20 bg-primary/5">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold mb-3">💡 Try These Payloads:</h3>
+          <h3 className="text-lg font-semibold mb-3">{t("command_injection.payloads_title")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm font-mono">
             <div className="p-2 bg-background rounded border">
-              <strong>Command chaining:</strong><br />
+              <strong>{t("command_injection.command_chaining")}</strong><br />
               <code>127.0.0.1; cat /etc/passwd</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>Logical AND:</strong><br />
+              <strong>{t("command_injection.logical_and")}</strong><br />
               <code>127.0.0.1 && whoami</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>Pipe operator:</strong><br />
+              <strong>{t("command_injection.pipe_operator")}</strong><br />
               <code>127.0.0.1 | ls -la</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>Background execution:</strong><br />
+              <strong>{t("command_injection.background_execution")}</strong><br />
               <code>127.0.0.1 & ps aux</code>
             </div>
           </div>

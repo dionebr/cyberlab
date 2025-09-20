@@ -7,6 +7,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { SecurityLevelProvider } from "./contexts/SecurityLevelContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { LearnProgressProvider } from "./contexts/LearnProgressContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Learn from "./pages/Learn";
@@ -19,31 +20,33 @@ const App = () => (
     <LanguageProvider>
       <ThemeProvider>
         <SecurityLevelProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter
-              future={{
-                v7_startTransition: true,
-                v7_relativeSplatPath: true
-              }}
-            >
-              <SidebarProvider defaultOpen={true}>
-                <div className="min-h-screen flex w-full">
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/learn" element={<Learn />} />
-                    <Route path="/learn/:category" element={<Learn />} />
-                    <Route path="/learn/:category/:level" element={<Learn />} />
-                    <Route path="/challenges/:moduleId" element={<Challenge />} />
-                    <Route path="/challenges/:moduleId/:level" element={<Challenge />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </div>
-              </SidebarProvider>
-            </BrowserRouter>
-          </TooltipProvider>
+          <LearnProgressProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true
+                }}
+              >
+                <SidebarProvider defaultOpen={true}>
+                  <div className="min-h-screen flex w-full">
+                    <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/learn" element={<Learn />} />
+                      <Route path="/learn/:category" element={<Learn />} />
+                      <Route path="/learn/:category/:level" element={<Learn />} />
+                      <Route path="/challenges/:moduleId" element={<Challenge />} />
+                      <Route path="/challenges/:moduleId/:level" element={<Challenge />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </div>
+                </SidebarProvider>
+              </BrowserRouter>
+            </TooltipProvider>
+          </LearnProgressProvider>
         </SecurityLevelProvider>
       </ThemeProvider>
     </LanguageProvider>

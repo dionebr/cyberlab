@@ -54,12 +54,12 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
           vulnerability = true;
           severity = "danger";
           executionPath = `/uploads/${file.name}`;
-          notes.push("🚨 Malicious file uploaded successfully!");
+          notes.push(t("file_upload.malicious_uploaded_successfully"));
           notes.push(`💀 ${fileExt.toUpperCase()} file can be executed on server`);
           notes.push("🔓 No file type validation implemented");
           notes.push(`⚡ Access webshell at: ${executionPath}`);
         } else {
-          notes.push("✅ File uploaded successfully");
+          notes.push(t("file_upload.file_uploaded_successfully"));
           notes.push("📁 File stored in uploads directory");
         }
         break;
@@ -100,7 +100,7 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
           severity = "warning";
           uploaded = true;
           executionPath = `/uploads/${file.name}`;
-          notes.push("🚨 Double extension bypass successful!");
+          notes.push(t("file_upload.double_extension_bypass"));
           notes.push("⚠️ File.php.jpg bypassed extension filter");
           notes.push("💡 Server may execute as PHP despite .jpg extension");
         } else {
@@ -203,26 +203,23 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
             <Upload className="h-8 w-8 text-primary" />
-            File Upload Security
+                        {t("file_upload.title")}
           </h1>
           <p className="text-lg text-muted-foreground mt-2">
-            Learn about file upload vulnerabilities and security bypass techniques
+                        {t("file_upload.description")}
           </p>
         </div>
         <Badge variant="outline" className="text-sm">
-          Level: {difficulty}
+          Level: {t(`difficulty.${difficulty}`)}
         </Badge>
       </div>
 
       {/* File Upload Form */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5" />
-            Document Upload System
-          </CardTitle>
+                    <CardTitle>{t("file_upload.prevention_methods")}</CardTitle>
           <CardDescription>
-            Upload your files to the secure document management system
+                        {t("file_upload.uploader_desc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -241,7 +238,7 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
               >
                 <div className="text-center">
                   <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <div className="text-sm">Click to select file</div>
+                  <div className="text-sm">{t("file_upload.choose_file")}</div>
                 </div>
               </Button>
             </div>
@@ -265,19 +262,19 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
               disabled={!selectedFile || isUploading}
               className="w-full"
             >
-              {isUploading ? "Uploading..." : "Upload File"}
+              {isUploading ? t("file_upload.uploading") : t("file_upload.upload")}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Upload Results */}
+      {/*               {t("file_upload.upload_results")} */}
       {results && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {getSeverityIcon(results.severity)}
-              Upload Analysis
+              {t("file_upload.upload_analysis")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -286,31 +283,31 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
               {results.uploaded ? (
                 <>
                   <CheckCircle className="h-6 w-6 text-success" />
-                  <span className="font-semibold text-success">Upload Successful</span>
+                  <span className="font-semibold text-success">{t("file_upload.upload_successful")}</span>
                 </>
               ) : (
                 <>
                   <XCircle className="h-6 w-6 text-danger" />
-                  <span className="font-semibold text-danger">Upload Rejected</span>
+                  <span className="font-semibold text-danger">{t("file_upload.upload_rejected")}</span>
                 </>
               )}
             </div>
 
             {/* File Information */}
             <div>
-              <h4 className="font-semibold text-foreground mb-2">File Information:</h4>
+              <h4 className="font-semibold text-foreground mb-2">{t("file_upload.file_information")}:</h4>
               <div className="bg-muted p-3 rounded-md space-y-1 text-sm">
-                <div><strong>Original Name:</strong> {results.originalName}</div>
-                {results.uploaded && <div><strong>Stored As:</strong> {results.filename}</div>}
-                <div><strong>Type:</strong> {results.fileType}</div>
-                <div><strong>Size:</strong> {formatFileSize(results.fileSize)}</div>
+                <div><strong>{t("file_upload.original_name")}:</strong> {results.originalName}</div>
+                {results.uploaded && <div><strong>{t("file_upload.stored_as")}:</strong> {results.filename}</div>}
+                <div><strong>{t("file_upload.type")}:</strong> {results.fileType}</div>
+                <div><strong>{t("file_upload.size")}:</strong> {formatFileSize(results.fileSize)}</div>
               </div>
             </div>
 
             {/* Execution Path */}
             {results.executionPath && (
               <div>
-                <h4 className="font-semibold text-foreground mb-2">⚠️ Potential Webshell Access:</h4>
+                <h4 className="font-semibold text-foreground mb-2">⚠️ {t("file_upload.potential_webshell_access")}:</h4>
                 <code className="block bg-danger/10 border border-danger/20 p-3 rounded text-sm">
                   {results.executionPath}
                 </code>
@@ -319,7 +316,7 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
 
             {/* Security Analysis */}
             <div>
-              <h4 className="font-semibold text-foreground mb-2">Security Analysis:</h4>
+              <h4 className="font-semibold text-foreground mb-2">{t("file_upload.security_analysis")}:</h4>
               <div className="space-y-2">
                 {results.notes.map((note, index) => (
                   <div key={index} className="flex items-start gap-2">
@@ -334,7 +331,7 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
             <div>
               <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                 <Shield className="h-4 w-4 text-success" />
-                Prevention Methods:
+                {t("file_upload.prevention_methods")}:
               </h4>
               <div className="space-y-2">
                 {results.prevention.map((tip, index) => (
@@ -354,13 +351,13 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-warning" />
-            Common Upload Attack Techniques
+            {t("file_upload.common_attack_techniques")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-semibold mb-2">File Extension Bypasses:</h4>
+              <h4 className="font-semibold mb-2">{t("file_upload.file_extension_bypasses")}:</h4>
               <div className="space-y-1 text-sm font-mono bg-muted p-3 rounded-md">
                 <div>shell.php.jpg</div>
                 <div>shell.php%00.jpg</div>
@@ -369,12 +366,12 @@ export const FileUploadModule = ({ difficulty }: FileUploadModuleProps) => {
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">MIME Type Spoofing:</h4>
+              <h4 className="font-semibold mb-2">{t("file_upload.mime_type_spoofing")}:</h4>
               <div className="space-y-1 text-sm bg-muted p-3 rounded-md">
-                <div>• Change Content-Type header</div>
-                <div>• Use image headers in PHP files</div>
-                <div>• Polyglot files (valid image + code)</div>
-                <div>• Magic bytes manipulation</div>
+                <div>• {t("file_upload.change_content_type")}</div>
+                <div>• {t("file_upload.use_image_headers")}</div>
+                <div>• {t("file_upload.polyglot_files")}</div>
+                <div>• {t("file_upload.magic_bytes_manipulation")}</div>
               </div>
             </div>
           </div>

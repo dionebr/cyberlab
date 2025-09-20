@@ -119,7 +119,7 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
           passwordChange = true;
           severity = "success";
           notes.push("✅ CAPTCHA solved correctly");
-          notes.push("🔒 Password updated successfully");
+          notes.push(t("insecure_captcha.password_updated"));
         } else if (userAnswer === "bypass_token_123") {
           // Hidden bypass for demonstration
           passwordChange = true;
@@ -139,7 +139,7 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
         if (userAnswer === correctAnswer) {
           passwordChange = true;
           severity = "success";
-          notes.push("✅ CAPTCHA verified successfully");
+          notes.push(t("insecure_captcha.captcha_verified"));
           notes.push("🛡️ Secure server-side validation");
           notes.push("🔒 Password updated with proper verification");
           notes.push("⏰ CAPTCHA token expires after use");
@@ -223,14 +223,14 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
             <Shield className="h-8 w-8 text-primary" />
-            Insecure CAPTCHA
+            {t("insecure_captcha.title")}
           </h1>
           <p className="text-lg text-muted-foreground mt-2">
-            Learn about CAPTCHA implementation flaws and bypass techniques
+                        {t("insecure_captcha.description")}
           </p>
         </div>
         <Badge variant="outline" className="text-sm">
-          Level: {difficulty}
+          Level: {t(`difficulty.${difficulty}`)}
         </Badge>
       </div>
 
@@ -240,37 +240,37 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              Change Password
+              {t("insecure_captcha.login_captcha")}
             </CardTitle>
             <CardDescription>
-              Update your account password with CAPTCHA verification
+              {t("insecure_captcha.login_desc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
                 <label htmlFor="new-password" className="block text-sm font-medium mb-2">
-                  New Password:
+                  Nova Senha:
                 </label>
                 <Input
                   id="new-password"
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
+                  placeholder="Digite a nova senha"
                   required
                 />
               </div>
               <div>
                 <label htmlFor="confirm-password" className="block text-sm font-medium mb-2">
-                  Confirm Password:
+                  Confirmar Senha:
                 </label>
                 <Input
                   id="confirm-password"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
+                  placeholder="Confirme a nova senha"
                   required
                 />
               </div>
@@ -278,7 +278,7 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
               {difficulty !== "medium" && (
                 <div>
                   <label htmlFor="captcha" className="block text-sm font-medium mb-2">
-                    CAPTCHA Verification:
+                    {t("insecure_captcha.captcha_code")}:
                   </label>
                   <div className="flex items-center gap-2 mb-2">
                     <div className="bg-muted p-3 rounded border font-mono text-lg">
@@ -305,14 +305,14 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
                     id="captcha"
                     value={captchaInput}
                     onChange={(e) => setCaptchaInput(e.target.value)}
-                    placeholder="Enter the answer"
+                    placeholder={t("insecure_captcha.enter_captcha")}
                     required
                   />
                 </div>
               )}
 
               <Button type="submit" disabled={isLoading} className="w-full">
-                {difficulty === "medium" ? "Continue" : (isLoading ? "Updating..." : "Update Password")}
+                {difficulty === "medium" ? "Continuar" : (isLoading ? t("insecure_captcha.verifying") : "Atualizar Senha")}
               </Button>
             </form>
           </CardContent>
@@ -325,17 +325,17 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              CAPTCHA Verification
+              {t("insecure_captcha.captcha_code")}
             </CardTitle>
             <CardDescription>
-              Complete the CAPTCHA to finalize password change
+                          {t("insecure_captcha.login_desc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
                 <label htmlFor="captcha-step2" className="block text-sm font-medium mb-2">
-                  Solve the math problem:
+                  Resolva o problema matemático:
                 </label>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="bg-muted p-3 rounded border font-mono text-lg">
@@ -349,7 +349,7 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
                   id="captcha-step2"
                   value={captchaInput}
                   onChange={(e) => setCaptchaInput(e.target.value)}
-                  placeholder="Enter the answer"
+                  placeholder={t("insecure_captcha.enter_captcha")}
                 />
               </div>
               <Button
@@ -357,7 +357,7 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
                 disabled={isLoading}
                 className="w-full"
               >
-                {isLoading ? "Verifying..." : "Complete Password Change"}
+                {isLoading ? t("insecure_captcha.verifying") : "Completar Mudança de Senha"}
               </Button>
             </div>
           </CardContent>
@@ -370,7 +370,7 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {getSeverityIcon(results.severity)}
-              CAPTCHA Analysis
+              {t("insecure_captcha.captcha_results")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -379,7 +379,7 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
               {results.passwordChange ? (
                 <>
                   <CheckCircle className="h-6 w-6 text-success" />
-                  <span className="font-semibold text-success">Password Changed Successfully</span>
+                  <span className="font-semibold text-success">{t("insecure_captcha.password_changed")}</span>
                 </>
               ) : (
                 <>
@@ -401,17 +401,17 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
 
             {/* CAPTCHA Details */}
             <div>
-              <h4 className="font-semibold text-foreground mb-2">CAPTCHA Details:</h4>
+              <h4 className="font-semibold text-foreground mb-2">{t("insecure_captcha.captcha_value")} {t("insecure_captcha.verification_result")}</h4>
               <div className="bg-muted p-3 rounded-md space-y-1 text-sm">
-                <div><strong>Correct Answer:</strong> {results.captchaAnswer}</div>
-                <div><strong>User Input:</strong> {results.userInput || "N/A"}</div>
-                <div><strong>Match:</strong> {results.userInput === results.captchaAnswer ? "✅ Yes" : "❌ No"}</div>
+                <div><strong>Resposta Correta:</strong> {results.captchaAnswer}</div>
+                <div><strong>{t("insecure_captcha.user_input")}</strong> {results.userInput || "N/A"}</div>
+                <div><strong>Match:</strong> {results.userInput === results.captchaAnswer ? "✅ Sim" : "❌ Não"}</div>
               </div>
             </div>
 
             {/* Security Analysis */}
             <div>
-              <h4 className="font-semibold text-foreground mb-2">Security Analysis:</h4>
+              <h4 className="font-semibold text-foreground mb-2">{t("auth_bypass.security_analysis")}</h4>
               <div className="space-y-2">
                 {results.notes.map((note, index) => (
                   <div key={index} className="flex items-start gap-2">
@@ -426,7 +426,7 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
             <div>
               <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                 <Shield className="h-4 w-4 text-success" />
-                Prevention Methods:
+                {t("auth_bypass.prevention_methods")}
               </h4>
               <div className="space-y-2">
                 {results.prevention.map((tip, index) => (
@@ -446,27 +446,27 @@ export const InsecureCaptchaModule = ({ difficulty }: InsecureCaptchaModuleProps
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-warning" />
-            CAPTCHA Bypass Techniques
+            {t("insecure_captcha.bypass_techniques")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-semibold mb-2">Implementation Flaws:</h4>
+              <h4 className="font-semibold mb-2">Falhas de Implementação:</h4>
               <div className="space-y-1 text-sm bg-muted p-3 rounded-md">
-                <div>• Client-side validation only</div>
-                <div>• Session state management issues</div>
-                <div>• Token reuse vulnerabilities</div>
-                <div>• Logic flow bypasses</div>
+                <div>• {t("insecure_captcha.client_side")}</div>
+                <div>• Problemas de gerenciamento de estado de sessão</div>
+                <div>• {t("insecure_captcha.reuse")}</div>
+                <div>• Bypasses de fluxo lógico</div>
               </div>
             </div>
             <div>
-              <h4 className="font-semibold mb-2">Attack Methods:</h4>
+              <h4 className="font-semibold mb-2">Métodos de Ataque:</h4>
               <div className="space-y-1 text-sm bg-muted p-3 rounded-md">
-                <div>• Direct form submission</div>
-                <div>• JavaScript disabled</div>
-                <div>• Replay attacks</div>
-                <div>• OCR automation</div>
+                <div>• Envio direto de formulário</div>
+                <div>• JavaScript desabilitado</div>
+                <div>• Ataques de replay</div>
+                <div>• Automação OCR</div>
               </div>
             </div>
           </div>
