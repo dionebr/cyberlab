@@ -298,21 +298,15 @@ module.exports = {
   logAuthBypass: logger.logAuthBypass,
   clearLogs: logger.clearLogs,
   vulnerableLogger: (req, res, next) => {
-    // Log TODAS as requisições com dados sensíveis
-    logger.logSensitive('HTTP_REQUEST', {
-      method: req.method,
-      url: req.url,
-      headers: req.headers, // Headers completos - pode conter tokens!
-      body: req.body, // Body completo - pode conter senhas!
-      query: req.query,
-      params: req.params,
-      cookies: req.cookies,
-      ip: req.ip,
-      user_agent: req.get('User-Agent'),
-      referer: req.get('Referer'),
-      session_id: req.sessionID,
-      timestamp: new Date()
-    });
+    // Log simplificado temporário para debug
+    try {
+      logger.info(`${req.method} ${req.url}`, {
+        ip: req.ip,
+        timestamp: new Date()
+      });
+    } catch (error) {
+      console.warn('Logger error:', error.message);
+    }
     
     next();
   }
