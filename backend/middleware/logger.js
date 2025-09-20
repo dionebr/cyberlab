@@ -296,7 +296,7 @@ module.exports = {
   logSensitive: logger.logSensitive,
   logVulnerableQuery,
   logVulnerableCommand,
-  logAuthBypass,
+  logAuthBypass: logger.logAuthBypass,
   clearLogs,
   vulnerableLogger: (req, res, next) => {
     // Log TODAS as requisições com dados sensíveis
