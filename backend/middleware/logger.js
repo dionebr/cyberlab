@@ -293,14 +293,14 @@ logger.info('🚨 CyberLab Vulnerable Logger initialized', {
 
 module.exports = {
   logger,
-  logSensitive,
+  logSensitive: logger.logSensitive,
   logVulnerableQuery,
   logVulnerableCommand,
   logAuthBypass,
   clearLogs,
   vulnerableLogger: (req, res, next) => {
     // Log TODAS as requisições com dados sensíveis
-    logSensitive('HTTP_REQUEST', {
+    logger.logSensitive('HTTP_REQUEST', {
       method: req.method,
       url: req.url,
       headers: req.headers, // Headers completos - pode conter tokens!
