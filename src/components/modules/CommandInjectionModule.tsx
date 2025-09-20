@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Terminal, AlertTriangle, CheckCircle, XCircle, Info } from "lucide-react";
+import { Terminal, AlertTriangle, CheckCircle, XCircle, Info, Wifi, Server, Shield, Command, Network, AlertCircle } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Badge } from "../ui/badge";
@@ -13,169 +14,232 @@ interface CommandInjectionModuleProps {
 
 export const CommandInjectionModule = ({ difficulty }: CommandInjectionModuleProps) => {
   const [userInput, setUserInput] = useState("");
+  const [cmdType, setCmdType] = useState("ping"); // ping, network-tools, system-info
+  const [toolType, setToolType] = useState("ping"); // para network-tools
+  const [infoType, setInfoType] = useState("basic"); // para system-info
+  const [targetField, setTargetField] = useState("host"); // host, target, options, custom
   const [results, setResults] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useLanguage();
 
-  const simulateCommandExecution = (input: string) => {
+  // API base URL
+  const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:5001' : '';
+
+  // Get severity-based icon
+  const getSeverityIcon = (severity: string) => {
+    switch (severity) {
+      case 'critical':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      case 'high':
+        return <AlertTriangle className="h-4 w-4 text-orange-500" />;
+      case 'medium':
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      case 'low':
+        return <Info className="h-4 w-4 text-blue-500" />;
+      case 'error':
+        return <XCircle className="h-4 w-4 text-red-600" />;
+      default:
+        return <Info className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  // Command execution with real API
+  const executeRealCommand = async (formData: FormData): Promise<any> => {
     setIsLoading(true);
     
-    setTimeout(() => {
-      let command = `ping -c 4 ${input}`;
-      let sanitizedInput = input;
-      let vulnerabilityDetected = false;
-      let educationalNote = "";
+    try {
+      // Extract form data
+      const input = formData.get('input') as string;
+      const type = formData.get('type') as string || cmdType;
+      const tool = formData.get('tool') as string || toolType;
+      const info = formData.get('info') as string || infoType;
+      const field = formData.get('field') as string || targetField;
+      
+      console.log('🚨 Executing Command Injection:', { input, type, tool, info, field, difficulty });
 
-      // Apply different security measures based on difficulty
-      switch (difficulty) {
-        case 'low':
-          // No sanitization - fully vulnerable
-          if (input.includes(";") || input.includes("&&") || input.includes("||") || input.includes("|")) {
-            vulnerabilityDetected = true;
-            if (input.includes("; cat /etc/passwd")) {
-              setResults({
-                command,
-                output: `PING ${input.split(';')[0]} (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.123ms\n\n--- Command Injection Detected ---\nroot:x:0:0:root:/root:/bin/bash\ndaemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin\nbin:x:2:2:bin:/bin:/usr/sbin/nologin\nwww-data:x:33:33:www-data:/var/www:/usr/sbin/nologin`,
-                vulnerable: true,
-                severity: "critical",
-                educationalNote: t("command_injection.semicolon_successful"),
-                exploitUsed: "Command Chaining (;)",
-                prevention: "Use parameterized commands and input validation."
-              });
-              setIsLoading(false);
-              return;
-            }
-            if (input.includes("&& whoami")) {
-              setResults({
-                command,
-                output: `PING ${input.split('&&')[0]} (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.156ms\n\nroot`,
-                vulnerable: true,
-                severity: "critical",
-                educationalNote: t("command_injection.and_operator_successful"),
-                exploitUsed: "Logical AND (&&)",
-                prevention: "Implement strict input validation and use safe command execution methods."
-              });
-              setIsLoading(false);
-              return;
-            }
-          }
-          educationalNote = "Low level has no input sanitization. Try payloads like: 127.0.0.1; cat /etc/passwd or 127.0.0.1 && whoami";
+      let url = '';
+      let options: RequestInit = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      };
+
+      switch (type) {
+        case 'ping':
+          // Ping command injection
+          url = `${API_BASE_URL}/api/cmd/ping`;
+          options.method = 'POST';
+          options.body = JSON.stringify({
+            host: input,
+            count: 4,
+            timeout: 5,
+            difficulty: difficulty
+          });
           break;
 
-        case 'medium':
-          // Filtro remove ; e &, exigindo operadores alternativos
-          sanitizedInput = input.replace(/[;&]/g, '');
-          command = `ping -c 4 ${sanitizedInput}`;
+        case 'network-tools':
+          // Network tools command injection
+          url = `${API_BASE_URL}/api/cmd/network-tools`;
+          options.method = 'POST';
           
-          // Check for bypasses using other operators
-          if (input.includes('||') && !input.includes(';') && !input.includes('&')) {
-            if (input.includes('|| whoami')) {
-              setResults({
-                command,
-                output: `PING ${input.split('||')[0]} (127.0.0.1): 56 data bytes\n--- ping failed ---\n\nroot`,
-                vulnerable: true,
-                severity: "critical",
-                educationalNote: "Medium level filters ; and & but || operator bypassed the filter!",
-                exploitUsed: "Logical OR (||) bypass",
-                prevention: "Filter ALL command operators, not just specific ones."
-              });
-              setIsLoading(false);
-              return;
-            }
-          }
-          
-          if (input !== sanitizedInput) {
-            educationalNote = "Medium level filters ; and & characters, but other operators like || may work.";
-          } else {
-            educationalNote = t("command_injection.medium_filtering");
-          }
-          break;
-
-        case 'high':
-          // Filtro remove espaços e mais operadores, exigindo técnicas avançadas
-          sanitizedInput = input.replace(/[^a-zA-Z0-9\.-]/g, '');
-          command = `ping -c 4 ${sanitizedInput}`;
-          
-          // Check for advanced bypasses like command substitution without spaces
-          if (input.includes('`') && input.replace(/`.*`/, '').trim()) {
-            if (input.includes('`whoami`') || input.includes('$(whoami)')) {
-              setResults({
-                command,
-                output: `PING 127001root (127.0.0.1): 56 data bytes\n--- Advanced injection detected ---\nCommand substitution bypassed space filtering`,
-                vulnerable: true,
-                severity: "high",
-                educationalNote: "High level filters spaces and operators but command substitution without spaces bypassed the filter!",
-                exploitUsed: "Command substitution bypass",
-                prevention: "Use strict allowlist validation and parameterized commands."
-              });
-              setIsLoading(false);
-              return;
-            }
-          }
-          
-          if (input !== sanitizedInput) {
-            educationalNote = "High level removes spaces and most special characters. Advanced techniques like ${IFS} or command substitution might work.";
-          } else {
-            educationalNote = "High level implements advanced filtering. Try space bypasses: ${IFS}, $'\\t', or command substitution.";
-          }
-          break;
-          
-        case 'impossible':
-          // Validação estrita de entrada (allowlist)
-          const allowedHosts = ['127.0.0.1', 'localhost', 'google.com', 'github.com'];
-          if (allowedHosts.includes(input.trim())) {
-            sanitizedInput = input.trim();
-            command = `ping -c 4 ${sanitizedInput}`;
-            educationalNote = "Impossible level uses strict allowlist validation. Only predefined safe hosts are allowed.";
-          } else {
-            setResults({
-              command: `ping -c 4 ${input}`,
-              output: "Error: Host not in allowlist. Allowed hosts: 127.0.0.1, localhost, google.com, github.com",
-              vulnerable: false,
-              severity: "safe",
-              educationalNote: "Impossible level blocks all inputs not in the predefined allowlist.",
-              exploitUsed: "None - Input rejected",
-              prevention: "Perfect! Allowlist validation prevents all injection attempts."
+          if (tool === 'custom') {
+            options.body = JSON.stringify({
+              tool: 'custom',
+              custom_command: input,
+              difficulty: difficulty
             });
-            setIsLoading(false);
-            return;
+          } else {
+            let requestData: any = {
+              tool: tool,
+              difficulty: difficulty
+            };
+            
+            if (field === 'target') {
+              requestData.target = input;
+            } else if (field === 'options') {
+              requestData.options = input;
+            }
+            
+            options.body = JSON.stringify(requestData);
           }
           break;
+
+        case 'system-info':
+          // System info command injection
+          url = `${API_BASE_URL}/api/cmd/system-info`;
+          const params = new URLSearchParams();
+          if (info === 'custom') {
+            params.set('cmd', input);
+          } else {
+            params.set('detail', input.includes(';') || input.includes('&&') ? input : info);
+          }
+          url += `?${params}`;
+          options.method = 'GET';
+          break;
+
+        default:
+          throw new Error(`Unsupported command type: ${type}`);
       }
 
-      // Simulate normal ping output
-      const cleanInput = sanitizedInput || '127.0.0.1';
-      setResults({
-        command,
-        output: `PING ${cleanInput} (127.0.0.1): 56 data bytes\n64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.123ms\n64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.098ms\n64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.087ms\n64 bytes from 127.0.0.1: icmp_seq=4 ttl=64 time=0.092ms\n\n--- ${cleanInput} ping statistics ---\n4 packets transmitted, 4 received, 0% packet loss`,
-        vulnerable: vulnerabilityDetected,
-        severity: vulnerabilityDetected ? "high" : "safe",
-        educationalNote,
-        exploitUsed: vulnerabilityDetected ? "Command Injection" : "None",
-        prevention: "Use parameterized commands, input validation, and least privilege principles."
-      });
+      console.log('📡 Making API request:', url);
+      const response = await fetch(url, options);
       
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('📥 API Response:', data);
+      
+      // Process and format results
+      const processedResults = {
+        command_type: type,
+        tool_used: tool !== 'ping' ? tool : undefined,
+        info_type: info !== 'basic' ? info : undefined,
+        field_targeted: field,
+        command_executed: data.command_executed || data.executed_command || `${type} command with input: ${input}`,
+        stdout: data.stdout || data.output,
+        stderr: data.stderr || data.error_output,
+        success: data.success,
+        vulnerable: detectCommandInjection(input, data),
+        severity: determineCommandSeverity(input, data),
+        exploit_used: detectCommandExploitType(input, data),
+        raw_response: data,
+        execution_time: data.execution_time || 0,
+        system_info: data.system_info,
+        educational_note: generateCommandEducationalNote(input, type, difficulty, data),
+        prevention_tips: data.debug?.prevention || "Use parameterized commands and strict input validation"
+      };
+
+      setResults(processedResults);
+      
+    } catch (error) {
+      console.error('❌ Command Execution Error:', error);
+      
+      setResults({
+        command_type: cmdType,
+        input: userInput,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        educational_note: `Error executing command: ${error instanceof Error ? error.message : 'Unknown error'}. Make sure the backend server is running on port 5001.`,
+        severity: 'error',
+        vulnerable: false
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
+  };
+
+  const detectCommandInjection = (input: string, data: any): boolean => {
+    if (data.debug?.command_injection_detected) return true;
+    
+    const injectionPatterns = [';', '&&', '||', '|', '`', '$', '$(', '${'];
+    return injectionPatterns.some(pattern => input.includes(pattern));
+  };
+
+  const determineCommandSeverity = (input: string, data: any): string => {
+    if (data.error || !data.success) return 'error';
+    
+    if (detectCommandInjection(input, data)) {
+      if (input.includes('/etc/passwd') || input.includes('rm -rf') || 
+          input.includes('cat') || input.includes('whoami') || 
+          input.includes('id') || input.includes('uname')) {
+        return 'critical';
+      }
+      if (input.includes('&&') || input.includes('||') || input.includes(';')) {
+        return 'high';
+      }
+      return 'medium';
+    }
+    
+    return 'low';
+  };
+
+  const detectCommandExploitType = (input: string, data: any): string => {
+    if (!detectCommandInjection(input, data)) return 'Normal Command';
+    
+    if (input.includes(';')) return 'Command Separator (;)';
+    if (input.includes('&&')) return 'Logical AND (&&)';
+    if (input.includes('||')) return 'Logical OR (||)';
+    if (input.includes('|')) return 'Pipe Operator (|)';
+    if (input.includes('`') || input.includes('$(')) return 'Command Substitution';
+    if (input.includes('&')) return 'Background Execution (&)';
+    
+    return 'Advanced Injection';
+  };
+
+  const generateCommandEducationalNote = (input: string, type: string, difficulty: string, data: any): string => {
+    if (data.error) return `Command execution failed: ${data.error}`;
+    
+    if (detectCommandInjection(input, data)) {
+      switch (difficulty) {
+        case 'easy':
+          return `🚨 Command injection successful! Easy mode has minimal filtering, allowing most injection techniques. Your payload "${input}" was executed.`;
+        case 'medium':
+          return `⚠️ Command injection detected! Medium difficulty may have basic filtering, but your payload potentially bypassed it. Advanced techniques often work against incomplete filters.`;
+        case 'hard':
+          return `🔒 Advanced command injection attempt! Hard mode implements strong filtering, but sophisticated techniques might still succeed. This demonstrates the difficulty of perfect input validation.`;
+        case 'impossible':
+          return `✅ Impossible mode uses allowlist validation and parameterized commands. Command injection should be blocked completely at this level.`;
+      }
+    }
+    
+    return `Command executed normally. No injection patterns detected in: "${input}"`;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!userInput.trim()) return;
-    simulateCommandExecution(userInput);
-  };
-
-  const getSeverityIcon = (severity: string) => {
-    switch (severity) {
-      case 'critical':
-        return <XCircle className="h-5 w-5 text-danger" />;
-      case 'high':
-        return <AlertTriangle className="h-5 w-5 text-warning" />;
-      case 'safe':
-        return <CheckCircle className="h-5 w-5 text-success" />;
-      default:
-        return <Info className="h-5 w-5 text-info" />;
-    }
+    
+    // Create FormData for the API call
+    const formData = new FormData();
+    formData.set('input', userInput);
+    formData.set('type', cmdType);
+    formData.set('tool', toolType);
+    formData.set('info', infoType);
+    formData.set('field', targetField);
+    
+    executeRealCommand(formData);
   };
 
   return (
@@ -189,113 +253,311 @@ export const CommandInjectionModule = ({ difficulty }: CommandInjectionModulePro
           <h1 className="text-3xl font-bold">{t("command_injection.title")}</h1>
           <p className="text-muted-foreground">{t("command_injection.description")}</p>
           <Badge variant="outline" className="mt-2">
-            Level: {t(`difficulty.${difficulty}`)}
+            Difficulty: {difficulty}
           </Badge>
         </div>
       </div>
 
-      {/* Input Section */}
+      {/* Command Injection Form */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Terminal className="h-5 w-5" />
-            {t("command_injection.network_ping")}
+            <Command className="h-5 w-5" />
+            Command Injection Interface
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="host" className="block text-sm font-medium mb-2">
-                {t("command_injection.host_ip")}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Command Type Selection */}
+            <div className="space-y-2">
+              <label htmlFor="cmd-type" className="text-sm font-medium">
+                Command Type
+              </label>
+              <select
+                id="cmd-type"
+                value={cmdType}
+                onChange={(e) => setCmdType(e.target.value)}
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="ping">Ping Command</option>
+                <option value="network-tools">Network Tools</option>
+                <option value="system-info">System Information</option>
+              </select>
+            </div>
+
+            {/* Tool Selection for Network Tools */}
+            {cmdType === 'network-tools' && (
+              <div className="space-y-2">
+                <label htmlFor="tool-type" className="text-sm font-medium">
+                  Tool Selection
+                </label>
+                <select
+                  id="tool-type"
+                  value={toolType}
+                  onChange={(e) => setToolType(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="nmap">Nmap Scanner</option>
+                  <option value="netstat">Netstat</option>
+                  <option value="traceroute">Traceroute</option>
+                  <option value="custom">Custom Command</option>
+                </select>
+              </div>
+            )}
+
+            {/* Info Type Selection for System Info */}
+            {cmdType === 'system-info' && (
+              <div className="space-y-2">
+                <label htmlFor="info-type" className="text-sm font-medium">
+                  Information Type
+                </label>
+                <select
+                  id="info-type"
+                  value={infoType}
+                  onChange={(e) => setInfoType(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="basic">Basic System Info</option>
+                  <option value="processes">Process Information</option>
+                  <option value="network">Network Configuration</option>
+                  <option value="custom">Custom Query</option>
+                </select>
+              </div>
+            )}
+
+            {/* Field Targeting for Network Tools */}
+            {cmdType === 'network-tools' && toolType !== 'custom' && (
+              <div className="space-y-2">
+                <label htmlFor="target-field" className="text-sm font-medium">
+                  Target Field
+                </label>
+                <select
+                  id="target-field"
+                  value={targetField}
+                  onChange={(e) => setTargetField(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="target">Target/Host Field</option>
+                  <option value="options">Options/Parameters Field</option>
+                </select>
+              </div>
+            )}
+
+            {/* User Input */}
+            <div className="space-y-2">
+              <label htmlFor="user-input" className="text-sm font-medium">
+                {cmdType === 'ping' ? 'Host/IP Address:' : 
+                 cmdType === 'network-tools' && toolType === 'custom' ? 'Custom Command:' :
+                 cmdType === 'network-tools' ? `${targetField === 'target' ? 'Target' : 'Options'}:` :
+                 'System Query:'}
               </label>
               <Input
-                id="host"
-                type="text"
+                id="user-input"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                placeholder={t("command_injection.host_placeholder")}
-                className="font-mono"
+                placeholder={
+                  cmdType === 'ping' ? "e.g., 127.0.0.1 or 127.0.0.1; whoami" :
+                  cmdType === 'network-tools' && toolType === 'custom' ? "e.g., nmap -sn 127.0.0.1" :
+                  cmdType === 'network-tools' ? "e.g., 192.168.1.1 or 192.168.1.1 && id" :
+                  "e.g., basic or /etc/passwd"
+                }
+                disabled={isLoading}
+                className="font-mono text-sm"
               />
             </div>
-            <Button 
-              type="submit" 
-              disabled={isLoading || !userInput.trim()}
-              className="w-full bg-accent hover:bg-accent/90"
-            >
-              {isLoading ? t("command_injection.executing") : t("command_injection.execute_ping")}
+
+            {/* Submit Button */}
+            <Button type="submit" disabled={isLoading || !userInput.trim()} className="w-full">
+              {isLoading ? 'Executing Command...' : `Execute ${cmdType} Command`}
             </Button>
           </form>
         </CardContent>
       </Card>
 
-      {/* Results Section */}
+      {/* Command Injection Results */}
       {results && (
         <div className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 {getSeverityIcon(results.severity)}
-                {t("command_injection.command_results")}
+                Command Execution Results
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Command Display */}
-              <div>
-                <h4 className="font-semibold mb-2">{t("command_injection.executed_command")}</h4>
-                <code className="block p-3 bg-muted rounded text-sm font-mono">
-                  {results.command}
-                </code>
+              {/* Attack Summary */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <h4 className="font-semibold mb-1">Command Type</h4>
+                  <Badge variant="outline">{results.command_type}</Badge>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-1">Tool/Method</h4>
+                  <Badge variant="outline">{results.tool_used || results.info_type || 'ping'}</Badge>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-1">Injection Point</h4>
+                  <Badge variant="outline">{results.field_targeted}</Badge>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-1">Severity</h4>
+                  <Badge variant={
+                    results.severity === 'critical' ? 'destructive' :
+                    results.severity === 'high' ? 'default' : 'secondary'
+                  }>
+                    {results.severity}
+                  </Badge>
+                </div>
               </div>
 
-              {/* Output */}
+              {/* Executed Command */}
               <div>
-                <h4 className="font-semibold mb-2">{t("command_injection.command_output")}</h4>
-                <pre className="p-3 bg-muted rounded text-sm font-mono whitespace-pre-wrap">
-                  {results.output}
-                </pre>
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Terminal className="h-4 w-4" />
+                  Executed Command(s)
+                </h4>
+                <code className="block p-3 bg-muted rounded text-sm font-mono break-all whitespace-pre-wrap">
+                  {results.command_executed}
+                </code>
+                {results.execution_time > 0 && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Execution time: {results.execution_time}ms
+                  </p>
+                )}
               </div>
+
+              {/* Command Output */}
+              {results.stdout && (
+                <div>
+                  <h4 className="font-semibold mb-2 flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-success" />
+                    Command Output (stdout)
+                  </h4>
+                  <pre className="p-3 bg-muted rounded text-sm font-mono whitespace-pre-wrap overflow-auto max-h-64">
+                    {results.stdout}
+                  </pre>
+                </div>
+              )}
+
+              {/* Error Output */}
+              {results.stderr && (
+                <div>
+                  <h4 className="font-semibold mb-2 flex items-center gap-2">
+                    <XCircle className="h-4 w-4 text-danger" />
+                    Error Output (stderr)
+                  </h4>
+                  <pre className="p-3 bg-danger/10 border border-danger/20 rounded text-sm font-mono whitespace-pre-wrap">
+                    {results.stderr}
+                  </pre>
+                </div>
+              )}
+
+              {/* System Information */}
+              {results.system_info && (
+                <div>
+                  <h4 className="font-semibold mb-2 flex items-center gap-2">
+                    <Server className="h-4 w-4" />
+                    System Information Exposed
+                  </h4>
+                  <div className="p-3 bg-warning/10 border border-warning/20 rounded text-sm">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      <div><strong>Platform:</strong> {results.system_info.platform}</div>
+                      <div><strong>Architecture:</strong> {results.system_info.arch}</div>
+                      <div><strong>Hostname:</strong> {results.system_info.hostname}</div>
+                      <div><strong>Uptime:</strong> {Math.floor((results.system_info.uptime || 0) / 3600)}h</div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Educational Note */}
-              {results.educationalNote && (
-                <Alert className={results.vulnerable ? "border-danger bg-danger/10" : "border-success bg-success/10"}>
+              {results.educational_note && (
+                <Alert className={
+                  results.severity === 'critical' ? "border-danger bg-danger/10" :
+                  results.severity === 'high' ? "border-warning bg-warning/10" :
+                  results.severity === 'error' ? "border-destructive bg-destructive/10" :
+                  "border-success bg-success/10"
+                }>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Educational Note:</strong> {results.educationalNote}
+                    <strong>Analysis:</strong> {results.educational_note}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Exploit Information */}
+              {results.exploit_used && results.exploit_used !== 'Normal Command' && (
+                <Alert className="border-info bg-info/10">
+                  <Command className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Exploit Technique:</strong> {results.exploit_used}
                   </AlertDescription>
                 </Alert>
               )}
 
               {/* Prevention Tips */}
-              <Alert className="border-info bg-info/10">
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Prevention:</strong> {results.prevention}
-                </AlertDescription>
-              </Alert>
+              {results.prevention_tips && (
+                <Alert className="border-primary bg-primary/10">
+                  <Shield className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Prevention:</strong> {results.prevention_tips}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Error Display */}
+              {results.error && (
+                <Alert className="border-destructive bg-destructive/10">
+                  <XCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Connection Error:</strong> {results.error}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Raw API Response (Debug) */}
+              {results.raw_response && import.meta.env.DEV && (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
+                    🐛 Raw API Response (Dev Mode)
+                  </summary>
+                  <pre className="mt-2 p-3 bg-muted rounded text-xs overflow-auto max-h-40">
+                    {JSON.stringify(results.raw_response, null, 2)}
+                  </pre>
+                </details>
+              )}
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* Learning Tips */}
-      <Card className="border-primary/20 bg-primary/5">
-        <CardContent className="p-6">
-          <h3 className="text-lg font-semibold mb-3">{t("command_injection.payloads_title")}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm font-mono">
+      {/* Educational Examples */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Info className="h-5 w-5" />
+            Common Command Injection Techniques
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Try these common command injection patterns to test different vulnerability scenarios:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-2 bg-background rounded border">
-              <strong>{t("command_injection.command_chaining")}</strong><br />
+              <strong>Command Separator</strong><br />
               <code>127.0.0.1; cat /etc/passwd</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>{t("command_injection.logical_and")}</strong><br />
+              <strong>Logical AND</strong><br />
               <code>127.0.0.1 && whoami</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>{t("command_injection.pipe_operator")}</strong><br />
+              <strong>Pipe Operator</strong><br />
               <code>127.0.0.1 | ls -la</code>
             </div>
             <div className="p-2 bg-background rounded border">
-              <strong>{t("command_injection.background_execution")}</strong><br />
+              <strong>Background Execution</strong><br />
               <code>127.0.0.1 & ps aux</code>
             </div>
           </div>

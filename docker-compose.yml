@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  # Backend Node.js (Vulnerável)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cyberlab-backend
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=development
+      - PORT=5001
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=vulnerable_user
+      - DB_PASS=weak123
+      - DB_NAME=cyberlab_vulnerable
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mysql
+    restart: unless-stopped
+    networks:
+      - cyberlab-network
+
+  # Frontend React
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cyberlab-frontend  
+    ports:
+      - "8080:8080"
+    environment:
+      - VITE_API_URL=http://backend:5001
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - cyberlab-network
+
+  # MySQL Database (Vulnerável)
+  mysql:
+    image: mysql:8.0
+    container_name: cyberlab-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword123
+      - MYSQL_DATABASE=cyberlab_vulnerable
+      - MYSQL_USER=vulnerable_user
+      - MYSQL_PASSWORD=weak123
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - cyberlab-network
+
+  # phpMyAdmin (Para gerenciar MySQL)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: cyberlab-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+      - PMA_USER=vulnerable_user
+      - PMA_PASSWORD=weak123
+      - MYSQL_ROOT_PASSWORD=rootpassword123
+    depends_on:
+      - mysql
+    restart: unless-stopped
+    networks:
+      - cyberlab-network
+
+  # Redis (Para sessões e cache)
+  redis:
+    image: redis:7-alpine
+    container_name: cyberlab-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - cyberlab-network
+
+  # Redis Commander (Interface web para Redis)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: cyberlab-redis-commander
+    ports:
+      - "8082:8081"
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - cyberlab-network
+
+# Volumes
+volumes:
+  mysql_data:
+    driver: local
+
+# Network isolada
+networks:
+  cyberlab-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16

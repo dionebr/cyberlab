@@ -19,50 +19,83 @@ const fs = require('fs');
 require('dotenv').config();
 
 // Import custom middleware
-const logger = require('./middleware/logger');
-const errorHandler = require('./middleware/errorHandler');
-const securityHeaders = require('./middleware/securityHeaders');
+const { logger, vulnerableLogger } = require('./middleware/logger');
+const { vulnerableErrorHandler } = require('./middleware/errorHandler');
+const { vulnerableHeaders } = require('./middleware/securityHeaders');
 
-// Import database connection (VULNERÁVEL)
-const db = require('./config/database');
-
-// Import API routes (VULNERÁVEIS)
-const authRoutes = require('./api/auth');
-const sqlRoutes = require('./api/sql');
-const xssRoutes = require('./api/xss');
-const commandRoutes = require('./api/command');
-const fileRoutes = require('./api/file');
+// Import database connection (VULNERÁVEL) - com fallback
+let db = null;
+try {
+  db = require('./config/database');
+  console.log('✅ Database connection loaded');
+} catch (error) {
+  console.warn('⚠️ Database connection failed, continuing without DB:', error.message);
+}
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
 // 🚨 CONFIGURAÇÕES INTENCIONALMENTE VULNERÁVEIS
 // Para fins educacionais - NÃO usar em produção!
 
 // ============================================
-// MIDDLEWARE BÁSICO (com configurações fracas)
+// 🔧 CONFIGURAÇÃO DE MIDDLEWARES VULNERÁVEIS
 // ============================================
 
-// CORS permissivo - VULNERÁVEL
+// CORS permissivo - MUITO PERIGOSO!
 app.use(cors({
-  origin: true, // Permite qualquer origem - PERIGOSO!
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['*'] // Permite todos os headers - PERIGOSO!
+  origin: '*', // Permite qualquer origem!
+  credentials: true, // Com credenciais!
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['*'], // Qualquer header!
+  exposedHeaders: ['*'] // Expõe todos os headers!
 }));
 
-// Body parsing com limites altos - VULNERÁVEL
-app.use(express.json({ 
-  limit: '50mb', // Limite muito alto - DoS possível
-  strict: false  // Não é estrito na validação
-}));
-app.use(express.urlencoded({ 
-  extended: true, 
-  limit: '50mb' 
-}));
-
-// Cookie parser sem configurações seguras
+app.use(express.json({ limit: '50mb' })); // Limite muito alto!
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
+
+// Logging vulnerável
+app.use(vulnerableLogger);
+
+// Headers inseguros
+app.use(vulnerableHeaders);
+
+// Error handling que vaza informações
+app.use(vulnerableErrorHandler);
+
+// ============================================
+// 🚨 ROTAS DE API VULNERÁVEIS
+// ============================================
+
+// Sistema de autenticação vulnerável
+try {
+  app.use('/api/auth', require('./api/auth'));
+} catch (e) { console.warn('Auth routes not loaded:', e.message); }
+
+// Endpoints vulneráveis para demonstração de SQL Injection
+try {
+  app.use('/api/vulnerable', require('./api/vulnerabilities'));
+} catch (e) { console.warn('SQL routes not loaded:', e.message); }
+
+// Endpoints vulneráveis para demonstração de XSS
+try {
+  app.use('/api/xss', require('./api/xss'));
+} catch (e) { console.warn('XSS routes not loaded:', e.message); }
+
+// Endpoints vulneráveis para demonstração de Command Injection
+try {
+  app.use('/api/cmd', require('./api/command-injection'));
+} catch (e) { console.warn('Command injection routes not loaded:', e.message); }
+
+// Endpoints vulneráveis para demonstração de File Upload
+try {
+  app.use('/api/upload', require('./api/file-upload'));
+} catch (e) { console.warn('File upload routes not loaded:', e.message); }
+
+// ============================================
+// 🔧 ROTAS DE DEBUG E INFORMAÇÕES SENSÍVEIS
+// ============================================
 
 // Session management FRACO - VULNERÁVEL
 app.use(session({

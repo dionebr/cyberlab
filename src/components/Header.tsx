@@ -64,7 +64,7 @@ export const Header = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              {(["low", "medium", "high"] as const).map((level) => (
+              {(["easy", "medium", "hard"] as const).map((level) => (
                 <DropdownMenuItem 
                   key={level}
                   onClick={() => setSecurityLevel(level)}

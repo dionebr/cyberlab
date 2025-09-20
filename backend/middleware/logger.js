@@ -129,14 +129,51 @@ logger.logAttackSuccess = (type, payload, result, userIP) => {
 };
 
 // Log queries SQL vulneráveis
-logger.logVulnerableQuery = (query, params, userIP, result) => {
-  logger.warn(`🗃️ VULNERABLE SQL QUERY EXECUTED`, {
-    query: query, // Query completa - pode revelar estrutura DB
-    parameters: params,
-    result_count: result ? result.length : 0,
-    source_ip: userIP,
-    timestamp: new Date().toISOString(),
-    database: 'cyberlab_vulnerable'
+// Log de queries SQL vulneráveis
+const logVulnerableQuery = (query, parameters, ip, user) => {
+  logger.warn('VULNERABLE_SQL_EXECUTED', {
+    sql_query: query,
+    parameters: parameters,
+    client_ip: ip,
+    user: user,
+    timestamp: new Date(),
+    severity: 'HIGH',
+    category: 'SQL_INJECTION'
+  });
+  
+  // Log adicional em arquivo específico
+  sqlLogger.error('SQL_INJECTION_ATTEMPT', {
+    raw_query: query,
+    params: parameters,
+    ip: ip,
+    user_context: user,
+    stack: new Error().stack
+  });
+};
+
+// ============================================
+// 🚨 LOGGING ESPECÍFICO DE COMANDOS VULNERÁVEIS
+// ============================================
+
+// Log de comandos shell executados
+const logVulnerableCommand = (command, parameters, ip, user) => {
+  logger.warn('VULNERABLE_COMMAND_EXECUTED', {
+    command: command,
+    parameters: parameters,
+    client_ip: ip,
+    user: user,
+    timestamp: new Date(),
+    severity: 'HIGH',
+    category: 'COMMAND_INJECTION'
+  });
+  
+  // Log adicional em arquivo específico
+  commandLogger.error('COMMAND_EXECUTION', {
+    raw_command: command,
+    params: parameters,
+    ip: ip,
+    user_context: user,
+    stack: new Error().stack
   });
 };
 
@@ -254,4 +291,30 @@ logger.info('🚨 CyberLab Vulnerable Logger initialized', {
   warning: 'This logger is INTENTIONALLY INSECURE for educational purposes'
 });
 
-module.exports = logger;
+module.exports = {
+  logger,
+  logSensitive,
+  logVulnerableQuery,
+  logVulnerableCommand,
+  logAuthBypass,
+  clearLogs,
+  vulnerableLogger: (req, res, next) => {
+    // Log TODAS as requisições com dados sensíveis
+    logSensitive('HTTP_REQUEST', {
+      method: req.method,
+      url: req.url,
+      headers: req.headers, // Headers completos - pode conter tokens!
+      body: req.body, // Body completo - pode conter senhas!
+      query: req.query,
+      params: req.params,
+      cookies: req.cookies,
+      ip: req.ip,
+      user_agent: req.get('User-Agent'),
+      referer: req.get('Referer'),
+      session_id: req.sessionID,
+      timestamp: new Date()
+    });
+    
+    next();
+  }
+};

@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 
-export type SecurityLevel = "low" | "medium" | "high";
+export type SecurityLevel = "easy" | "medium" | "hard";
 
 export const useSecurityLevel = () => {
-  const [securityLevel, setSecurityLevel] = useState<SecurityLevel>("low");
+  const [securityLevel, setSecurityLevel] = useState<SecurityLevel>("easy");
 
   useEffect(() => {
     const savedLevel = localStorage.getItem("cyberlab-security-level") as SecurityLevel;
-    if (savedLevel && ["low", "medium", "high"].includes(savedLevel)) {
+    if (savedLevel && ["easy", "medium", "hard"].includes(savedLevel)) {
       setSecurityLevel(savedLevel);
     }
   }, []);
@@ -19,18 +19,18 @@ export const useSecurityLevel = () => {
 
   const getSecurityLevelColor = (level: SecurityLevel) => {
     switch (level) {
-      case "low": return "success";
+      case "easy": return "success";
       case "medium": return "warning"; 
-      case "high": return "danger";
+      case "hard": return "danger";
       default: return "success";
     }
   };
 
   const getSecurityLevelIcon = (level: SecurityLevel) => {
     switch (level) {
-      case "low": return "🟢";
+      case "easy": return "🟢";
       case "medium": return "🟡";
-      case "high": return "🔴";
+      case "hard": return "🔴";
       default: return "🟢";
     }
   };
