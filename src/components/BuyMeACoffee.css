@@ -1,0 +1,85 @@
+
+
+
+
+.buy-me-coffee-container {
+  position: fixed;
+  bottom: 16px;
+  right: 8px;
+  left: auto;
+  z-index: 100;
+  opacity: 0.85;
+}
+
+
+.buy-me-coffee-btn {
+  display: flex;
+  align-items: center;
+  background: #ffe066;
+  color: #222;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  text-decoration: none;
+  border: 1px solid #e2c044;
+  transition: box-shadow 0.2s, opacity 0.2s;
+  position: relative;
+  overflow: visible;
+  min-width: 0;
+}
+
+.buy-me-coffee-btn:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  opacity: 1;
+}
+
+
+.coffee-cup {
+  font-size: 1em;
+  margin-right: 5px;
+  position: relative;
+}
+
+
+.smoke {
+  position: absolute;
+  left: 14px;
+  top: 0px;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.buy-me-coffee-btn:hover .smoke {
+  opacity: 1;
+  animation: smokeUp 1.2s linear infinite;
+}
+
+@keyframes smokeUp {
+  0% {
+    transform: translateY(0) scaleX(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-10px) scaleX(1.1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-20px) scaleX(1.2);
+    opacity: 0;
+  }
+}
+
+
+.smoke::before {
+  content: '';
+  display: block;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle at 50% 50%, #fff 60%, transparent 100%);
+  border-radius: 50%;
+  opacity: 0.7;
+}
