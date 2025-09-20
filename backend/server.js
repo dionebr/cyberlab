@@ -23,6 +23,12 @@ const { logger, vulnerableLogger } = require('./middleware/logger');
 const { vulnerableErrorHandler } = require('./middleware/errorHandler');
 const { vulnerableHeaders } = require('./middleware/securityHeaders');
 
+// Debug das importações
+console.log('🔍 Debug: logger =', typeof logger);
+console.log('🔍 Debug: vulnerableLogger =', typeof vulnerableLogger);
+console.log('🔍 Debug: vulnerableErrorHandler =', typeof vulnerableErrorHandler);
+console.log('🔍 Debug: vulnerableHeaders =', typeof vulnerableHeaders);
+
 // Import database connection (VULNERÁVEL) - com fallback
 let db = null;
 try {
