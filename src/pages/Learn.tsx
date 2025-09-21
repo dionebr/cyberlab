@@ -3357,7 +3357,7 @@ const Learn = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Zap className="h-5 w-5 text-blue-600" />
-                        Conteúdo Interativo
+                        Interactive Content
                         <Badge variant="default" className="bg-blue-600">
                           {interactiveSections.length} atividade{interactiveSections.length > 1 ? 's' : ''}
                         </Badge>

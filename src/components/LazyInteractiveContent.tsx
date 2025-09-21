@@ -132,7 +132,7 @@ export const LazyInteractiveContent = ({ type, children, onLoad }: LazyInteracti
           <div className="flex flex-col items-center justify-center p-8 space-y-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-sm text-muted-foreground">
-              Carregando conteúdo interativo...
+              Loading interactive content...
             </p>
             {type === 'quiz' ? <QuizSkeleton /> : <ExerciseSkeleton />}
           </div>
@@ -143,7 +143,7 @@ export const LazyInteractiveContent = ({ type, children, onLoad }: LazyInteracti
         <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-muted-foreground/20 rounded-lg bg-muted/10">
           <div className="text-center space-y-4">
             <div className="text-4xl">📚</div>
-            <h3 className="font-semibold">Conteúdo Interativo</h3>
+            <h3 className="font-semibold">Interactive Content</h3>
             <p className="text-sm text-muted-foreground max-w-md">
               {type === 'quiz' 
                 ? 'Quiz interativo será carregado quando você rolar até aqui'

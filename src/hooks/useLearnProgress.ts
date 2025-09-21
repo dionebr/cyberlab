@@ -39,19 +39,28 @@ export const useLearnProgress = () => {
       if (savedProgress) {
         const parsed = JSON.parse(savedProgress);
         // Converter strings de data de volta para objetos Date
-        Object.keys(parsed).forEach(categoryId => {
-          Object.keys(parsed[categoryId].lessons).forEach(lessonId => {
-            const lesson = parsed[categoryId].lessons[lessonId];
-            if (lesson.completedAt) {
-              lesson.completedAt = new Date(lesson.completedAt);
-            }
-            lesson.lastAccessed = new Date(lesson.lastAccessed);
-          });
+        Object.keys(parsed || {}).forEach(categoryId => {
+          const category = parsed[categoryId];
+          if (category && category.lessons) {
+            Object.keys(category.lessons).forEach(lessonId => {
+              const lesson = category.lessons[lessonId];
+              if (lesson) {
+                if (lesson.completedAt) {
+                  lesson.completedAt = new Date(lesson.completedAt);
+                }
+                if (lesson.lastAccessed) {
+                  lesson.lastAccessed = new Date(lesson.lastAccessed);
+                }
+              }
+            });
+          }
         });
         setProgress(parsed);
       }
     } catch (error) {
       console.error('Erro ao carregar progresso:', error);
+      // Em caso de erro, inicializar com estrutura vazia
+      setProgress({});
     } finally {
       setLoading(false);
     }

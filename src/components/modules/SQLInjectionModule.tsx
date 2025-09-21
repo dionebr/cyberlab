@@ -19,7 +19,7 @@ export const SQLInjectionModule = ({ difficulty }: SQLInjectionModuleProps) => {
   const [searchField, setSearchField] = useState("username"); // username, email, role
   const { t } = useLanguage();
 
-  // API base URL - configuração para desenvolvimento e produção
+  // Base API URL - configuration for development and production
   const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:5001' : '';
 
   const executeRealSQLQuery = async (input: string, endpointType: string, field: string) => {

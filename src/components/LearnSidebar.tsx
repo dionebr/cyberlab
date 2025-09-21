@@ -18,7 +18,7 @@ interface LearnItem {
   children?: LearnItem[];
 }
 
-// Mapeamento do conteúdo das lições com total de seções
+// Lesson content mapping with total sections
 const lessonSectionCount: Record<string, number> = {
   "owasp-top10": 10,
   "secure-coding-principles": 8,

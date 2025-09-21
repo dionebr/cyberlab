@@ -54,7 +54,7 @@ export const CSRFModule = ({ difficulty }: CSRFModuleProps) => {
           break;
           
         case 'impossible':
-          // Token anti-CSRF + confirmação de senha do usuário
+          // Anti-CSRF token + user password confirmation
           hasToken = true;
           vulnerabilityDetected = false;
           educationalNote = "Maximum CSRF protection: anti-CSRF token + user password confirmation required for sensitive operations.";
