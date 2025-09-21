@@ -294,6 +294,13 @@ export const useChatBot = () => {
       };
     }
 
+    // Check for JWT Decoder questions
+    if (input.includes('decoder') || input.includes('decode') || input.includes('jwt.io')) {
+      return {
+        content: `${t('chat.jwt_decoder_help')}\n\n${t('chat.jwt_decoder_features')}\n\n${t('chat.jwt_decoder_tips')}`
+      };
+    }
+
     // Check for error-related questions
     if (input.includes('error') || input.includes('not working') || input.includes('failed')) {
       return {

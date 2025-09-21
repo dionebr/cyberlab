@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useSecurityLevelContext } from '@/contexts/SecurityLevelContext';
 import { useLanguage } from '@/hooks/useLanguage';
 import { Textarea } from '@/components/ui/textarea';
+import JWTDecoder from '@/components/JWTDecoder';
 
 interface User {
   username: string;
@@ -609,6 +610,32 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDh/nCDmXaEqxN4
               ))}
             </ol>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* JWT Decoder Tool */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('jwt.decoder_tool')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <JWTDecoder 
+            initialToken={token || customToken}
+            onTokenChange={(newToken) => {
+              setCustomToken(newToken);
+              // Auto-validate the token when it changes
+              if (newToken) {
+                try {
+                  const result = validateJWT(newToken);
+                  if (result.valid) {
+                    setDecodedToken(result.payload);
+                  }
+                } catch (error) {
+                  console.error('Token validation error:', error);
+                }
+              }
+            }}
+          />
         </CardContent>
       </Card>
     </div>
