@@ -219,6 +219,17 @@ app.use(vulnerableErrorHandler);
 // SERVER STARTUP
 // ============================================
 
+// Handlers para evitar crashes
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception:', error);
+  // NÃO fazer exit aqui para manter o servidor rodando
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // NÃO fazer exit aqui para manter o servidor rodando
+});
+
 // Verificar conexão com database (sem SSL)
 db.testConnection()
   .then(() => {
@@ -231,6 +242,7 @@ db.testConnection()
       })
       .catch(err => {
         logger.error('Failed to initialize vulnerable data:', err);
+        // Continuar mesmo com falha na inicialização
       });
   })
   .catch(err => {
@@ -264,13 +276,17 @@ app.listen(PORT, '0.0.0.0', () => {
 // Graceful shutdown
 process.on('SIGINT', () => {
   logger.info('🛑 Shutting down CyberLab Vulnerable Backend...');
-  db.close();
+  if (db && db.close) {
+    db.close();
+  }
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
   logger.info('🛑 Received SIGTERM, shutting down gracefully...');
-  db.close();
+  if (db && db.close) {
+    db.close();
+  }
   process.exit(0);
 });
 

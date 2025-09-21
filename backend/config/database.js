@@ -9,7 +9,7 @@
 const mysql = require('mysql2');
 const fs = require('fs');
 const path = require('path');
-const logger = require('../middleware/logger');
+const { logger } = require('../middleware/logger');
 
 // 🚨 CONFIGURAÇÕES VULNERÁVEIS - NÃO usar em produção!
 const dbConfig = {
@@ -106,28 +106,44 @@ const initVulnerableData = async () => {
   try {
     logger.info('🚨 Initializing vulnerable database schema and data...');
     
+    // Verificar se os arquivos SQL existem
+    const initPath = path.join(__dirname, '../database/init.sql');
+    const mockPath = path.join(__dirname, '../database/mock-data.sql');
+    
+    if (!fs.existsSync(initPath)) {
+      logger.warn('Init SQL file not found, skipping database initialization');
+      return;
+    }
+    
     // Ler e executar script de inicialização
-    const initScript = fs.readFileSync(
-      path.join(__dirname, 'init.sql'), 
-      'utf8'
-    );
+    const initScript = fs.readFileSync(initPath, 'utf8');
     
     // Executar múltiplas queries de uma vez - VULNERÁVEL
-    await executeDirectQuery(initScript);
+    try {
+      await executeDirectQuery(initScript);
+      logger.info('✅ Database schema initialized');
+    } catch (error) {
+      logger.warn('Failed to initialize database schema, may already exist:', error.message);
+    }
     
-    // Inserir dados vulneráveis
-    const mockDataScript = fs.readFileSync(
-      path.join(__dirname, 'mock-data.sql'),
-      'utf8'
-    );
+    // Inserir dados vulneráveis se o arquivo existir
+    if (fs.existsSync(mockPath)) {
+      const mockDataScript = fs.readFileSync(mockPath, 'utf8');
+      
+      try {
+        await executeDirectQuery(mockDataScript);
+        logger.info('✅ Mock data inserted successfully');
+      } catch (error) {
+        logger.warn('Failed to insert mock data, may already exist:', error.message);
+      }
+    }
     
-    await executeDirectQuery(mockDataScript);
-    
-    logger.info('✅ Vulnerable database initialized successfully');
+    logger.info('✅ Vulnerable database initialization completed');
     
   } catch (error) {
     logger.error('Failed to initialize vulnerable database:', error);
-    throw error;
+    // NÃO fazer throw para evitar crash do servidor
+    logger.warn('⚠️ Continuing without database initialization...');
   }
 };
 
