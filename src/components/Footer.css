@@ -141,7 +141,7 @@
   position: absolute;
   width: 3px;
   height: 18px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.9); /* Base branca */
   border-radius: 50% 50% 50% 50% / 0% 0% 100% 100%;
   animation: steam 1.2s ease-in-out infinite;
 }
@@ -149,13 +149,13 @@
 .coffee-steam::before {
   left: 0;
   animation-delay: 0s;
-  background: rgba(245, 158, 11, 0.8);
+  background: rgba(255, 255, 255, 0.9) !important; /* Branco para contraste */
 }
 
 .coffee-steam::after {
   left: 3px;
   animation-delay: 0.4s;
-  background: rgba(249, 115, 22, 0.6);
+  background: rgba(220, 220, 220, 0.8) !important; /* Cinza claro */
 }
 
 @keyframes steam {

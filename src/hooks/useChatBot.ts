@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { vulnerabilities, challenges, getContextualHelp, searchKnowledgeBase, ChatContext } from '@/data/chatKnowledgeBase';
 import { useLocation } from 'react-router-dom';
+import { useLanguageContext } from '@/contexts/LanguageContext';
 
 export interface ChatMessage {
   id: string;
@@ -24,6 +25,7 @@ const STORAGE_KEY = 'cyberlab-chat-history';
 
 export const useChatBot = () => {
   const location = useLocation();
+  const { t } = useLanguageContext();
   const [state, setState] = useState<ChatState>({
     messages: [],
     isOpen: false,
@@ -98,11 +100,51 @@ export const useChatBot = () => {
     initializeChat();
   }, []);
 
+  // Regenerate greeting when language changes
+  useEffect(() => {
+    if (state.messages.length > 0) {
+      const firstMessage = state.messages[0];
+      const isGreeting = firstMessage.type === 'bot' && (
+        firstMessage.content.includes('Good') || 
+        firstMessage.content.includes('Bom') ||
+        firstMessage.content.includes('Buenos') ||
+        firstMessage.content.includes('🛡️')
+      );
+      
+      if (isGreeting) {
+        const newGreeting = generateGreeting(state.context);
+        setState(prev => {
+          const updatedMessages = [...prev.messages];
+          updatedMessages[0] = {
+            ...firstMessage,
+            content: newGreeting
+          };
+          saveHistory(updatedMessages);
+          return {
+            ...prev,
+            messages: updatedMessages
+          };
+        });
+      }
+    }
+  }, [t]);  // Trigger when language changes
+
   useEffect(() => {
     if (state.context && state.messages.length > 0) {
       // Update greeting based on context change
       const lastMessage = state.messages[state.messages.length - 1];
-      if (lastMessage.type === 'bot' && lastMessage.content.includes('Good')) {
+      // Check if it's a greeting message (contains assistant intro or greeting)
+      const isGreeting = lastMessage.type === 'bot' && (
+        lastMessage.content.includes('Good') || 
+        lastMessage.content.includes('Bom') ||
+        lastMessage.content.includes('Buenos') ||
+        lastMessage.content.includes('Security Assistant') ||
+        lastMessage.content.includes('Assistente de Segurança') ||
+        lastMessage.content.includes('Asistente de Seguridad') ||
+        lastMessage.content.includes('🛡️')
+      );
+      
+      if (isGreeting) {
         const newGreeting = generateGreeting(state.context);
         // Update the last message if it's a greeting
         setState(prev => {
@@ -119,28 +161,28 @@ export const useChatBot = () => {
         });
       }
     }
-  }, [state.context]);
+  }, [state.context, t]);
 
   const generateGreeting = (context: ChatContext): string => {
     const time = new Date().getHours();
-    const timeGreeting = time < 12 ? 'Good morning' : time < 18 ? 'Good afternoon' : 'Good evening';
+    const timeGreeting = time < 12 ? t('chat.greeting_morning') : time < 18 ? t('chat.greeting_afternoon') : t('chat.greeting_evening');
     
-    let greeting = `${timeGreeting}! I'm your CyberLab Security Assistant. 🛡️\n\n`;
+    let greeting = `${timeGreeting}! ${t('chat.assistant_intro')}\n\n`;
     
     if (context.currentModule) {
       const moduleName = context.currentModule.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
-      greeting += `I see you're working on the ${moduleName} challenge. `;
+      greeting += t('chat.working_on_challenge').replace('{module}', moduleName) + ' ';
       
       if (context.difficulty) {
-        greeting += `This is a ${context.difficulty} level challenge. `;
+        greeting += t('chat.difficulty_level').replace('{difficulty}', context.difficulty) + ' ';
       }
       
-      greeting += `\n\nI can help you with:`;
+      greeting += `\n\n${t('chat.can_help_with')}`;
     } else {
-      greeting += `I can help you with various cybersecurity challenges including:`;
+      greeting += `${t('chat.can_help_with')}`;
     }
     
-    greeting += `\n• Vulnerability exploitation techniques\n• Payload suggestions and examples\n• Troubleshooting common errors\n• Security best practices\n\nWhat would you like to explore today?`;
+    greeting += `\n\n${t('chat.help_topics')}\n\n${t('chat.what_explore')}`;
     
     return greeting;
   };
@@ -167,7 +209,12 @@ export const useChatBot = () => {
 
   const addBotMessage = useCallback((content: string, payloads?: string[]) => {
     // Prevent duplicate greetings
-    if (content.includes('Good') && state.messages.some(msg => msg.content.includes('Good'))) {
+    const isGreeting = content.includes('Good') || content.includes('Bom') || content.includes('Buenos') || content.includes('🛡️');
+    const hasExistingGreeting = state.messages.some(msg => 
+      msg.content.includes('Good') || msg.content.includes('Bom') || msg.content.includes('Buenos') || msg.content.includes('🛡️')
+    );
+    
+    if (isGreeting && hasExistingGreeting) {
       return;
     }
     return addMessage({
@@ -208,7 +255,7 @@ export const useChatBot = () => {
     if (input.includes('sql') && input.includes('injection')) {
       const sqlVuln = vulnerabilities.find(v => v.id === 'sql-basic');
       return {
-        content: `Here are some SQL injection payloads to try:\n\n${sqlVuln?.payloads.map((p, i) => `${i + 1}. \`${p}\``).join('\n')}\n\nRemember to URL-encode special characters when testing in a browser. Start with the basic OR condition and work your way up to more complex UNION attacks.`,
+        content: `${t('chat.sql_injection_help')}\n\n${sqlVuln?.payloads.map((p, i) => `${i + 1}. \`${p}\``).join('\n')}\n\n${t('chat.sql_remember')}`,
         payloads: sqlVuln?.payloads
       };
     }
@@ -216,7 +263,7 @@ export const useChatBot = () => {
     if (input.includes('xss') || input.includes('cross-site')) {
       const xssVuln = vulnerabilities.find(v => v.id === 'xss-reflected');
       return {
-        content: `Here are some XSS payloads to test:\n\n${xssVuln?.payloads.map((p, i) => `${i + 1}. \`${p}\``).join('\n')}\n\nTry these in different contexts - URL parameters, form fields, and headers. If one doesn't work, try the others!`,
+        content: `${t('chat.xss_help')}\n\n${xssVuln?.payloads.map((p, i) => `${i + 1}. \`${p}\``).join('\n')}\n\n${t('chat.xss_try_contexts')}`,
         payloads: xssVuln?.payloads
       };
     }
@@ -224,7 +271,7 @@ export const useChatBot = () => {
     if (input.includes('command') && input.includes('injection')) {
       const cmdVuln = vulnerabilities.find(v => v.id === 'command-injection');
       return {
-        content: `Here are command injection payloads:\n\n${cmdVuln?.payloads.map((p, i) => `${i + 1}. \`${p}\``).join('\n')}\n\nStart with simple commands like \`whoami\` or \`ls\` to verify injection works, then try more complex commands.`,
+        content: `${t('chat.command_injection_help')}\n\n${cmdVuln?.payloads.map((p, i) => `${i + 1}. \`${p}\``).join('\n')}\n\n${t('chat.command_start_simple')}`,
         payloads: cmdVuln?.payloads
       };
     }
@@ -232,7 +279,7 @@ export const useChatBot = () => {
     // Check for error-related questions
     if (input.includes('error') || input.includes('not working') || input.includes('failed')) {
       return {
-        content: `I can help you troubleshoot! Here are some common issues and solutions:\n\n• **SQL Syntax Error**: Check quote placement and comment syntax\n• **Script Not Executing**: Try different XSS contexts or bypass CSP\n• **Command Not Found**: Verify the command exists on the target system\n• **Access Denied**: You may need different privileges or file paths\n\nCan you share the specific error message you're seeing?`
+        content: `${t('chat.troubleshoot_help')}\n\n${t('chat.common_issues')}\n\n${t('chat.share_error')}`
       };
     }
 
@@ -241,7 +288,7 @@ export const useChatBot = () => {
       const suggestions = getContextualHelp(context);
       if (suggestions.length > 0) {
         return {
-          content: `Based on your current challenge, here are some suggestions:\n\n${suggestions.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\nWould you like specific payloads for any of these techniques?`
+          content: `${t('chat.contextual_suggestions')}\n\n${suggestions.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\n${t('chat.want_payloads')}`
         };
       }
     }
@@ -252,22 +299,22 @@ export const useChatBot = () => {
       const result = searchResults[0];
       if ('payloads' in result) {
         return {
-          content: `I found information about **${result.name}**:\n\n${result.description}\n\nHere are some payloads to try:\n${result.payloads.slice(0, 3).map((p, i) => `${i + 1}. \`${p}\``).join('\n')}`,
+          content: `${t('chat.found_info').replace('{name}', result.name)}\n\n${result.description}\n\n${t('chat.try_payloads')}\n${result.payloads.slice(0, 3).map((p, i) => `${i + 1}. \`${p}\``).join('\n')}`,
           payloads: result.payloads.slice(0, 3)
         };
       } else {
         return {
-          content: `I found the **${result.name}** challenge. Here are some hints:\n\n${result.hints.map((h, i) => `${i + 1}. ${h}`).join('\n')}`
+          content: `${t('chat.found_challenge').replace('{name}', result.name)}\n\n${result.hints.map((h, i) => `${i + 1}. ${h}`).join('\n')}`
         };
       }
     }
 
     // Default response with contextual suggestions
     const suggestions = getContextualHelp(context);
-    let defaultResponse = `I'm here to help with your cybersecurity challenges! You can ask me about:\n\n• Specific vulnerabilities (SQL injection, XSS, etc.)\n• Payload examples and techniques\n• Troubleshooting errors\n• Security best practices`;
+    let defaultResponse = t('chat.default_help');
     
     if (suggestions.length > 0) {
-      defaultResponse += `\n\nBased on your current module, you might want to try:\n${suggestions.slice(0, 2).map(s => `• ${s}`).join('\n')}`;
+      defaultResponse += `\n\n${t('chat.based_on_module')}\n${suggestions.slice(0, 2).map(s => `• ${s}`).join('\n')}`;
     }
 
     return {
@@ -336,11 +383,11 @@ export const useChatBot = () => {
   const exportPayloads = useCallback((payloads: string[]) => {
     const text = payloads.join('\n');
     navigator.clipboard.writeText(text).then(() => {
-      addBotMessage('✅ Payloads copied to clipboard!');
+      addBotMessage(t('chat.payloads_copied'));
     }).catch(() => {
-      addBotMessage('❌ Failed to copy payloads. Please copy them manually.');
+      addBotMessage(t('chat.copy_failed'));
     });
-  }, [addBotMessage]);
+  }, [addBotMessage, t]);
 
   return {
     ...state,

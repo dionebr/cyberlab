@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import { X, MessageCircle, Send, RotateCcw, Copy, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useChatBot } from '@/hooks/useChatBot';
+import { useLanguageContext } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
 interface FloatingChatProps {
@@ -8,6 +9,7 @@ interface FloatingChatProps {
 }
 
 export const FloatingChat = ({ className }: FloatingChatProps) => {
+  const { t } = useLanguageContext();
   const {
     messages,
     isOpen,
@@ -176,8 +178,8 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-900 animate-pulse" />
             </div>
             <div>
-              <h3 className="text-white font-semibold text-sm">Security Assistant</h3>
-              <p className="text-gray-400 text-xs">Online • Ready to help</p>
+              <h3 className="text-white font-semibold text-sm">{t('chat.security_assistant')}</h3>
+              <p className="text-gray-400 text-xs">{t('chat.online_ready')}</p>
             </div>
           </div>
           
@@ -185,7 +187,7 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
             <button
               onClick={clearHistory}
               className="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-gray-700/50 transition-colors"
-              title="Clear chat history"
+              title={t('chat.clear_history')}
             >
               <RotateCcw className="w-4 h-4" />
             </button>
@@ -237,7 +239,7 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
                               ? "text-green-400 bg-green-400/20"
                               : "text-gray-500 hover:text-green-400"
                           )}
-                          title="Mark as helpful"
+                          title={t('chat.mark_helpful')}
                         >
                           <ThumbsUp className="w-3 h-3" />
                         </button>
@@ -249,7 +251,7 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
                               ? "text-red-400 bg-red-400/20"
                               : "text-gray-500 hover:text-red-400"
                           )}
-                          title="Mark as not helpful"
+                          title={t('chat.mark_not_helpful')}
                         >
                           <ThumbsDown className="w-3 h-3" />
                         </button>
@@ -259,7 +261,7 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
                       <button
                         onClick={() => copyToClipboard(message.content)}
                         className="text-gray-500 hover:text-white p-1 rounded transition-colors"
-                        title="Copy message"
+                        title={t('chat.copy_message')}
                       >
                         <Copy className="w-3 h-3" />
                       </button>
@@ -271,7 +273,7 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
                         onClick={() => exportPayloads(message.payloads!)}
                         className="text-xs px-2 py-1 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500/30 transition-colors"
                       >
-                        Export Payloads
+                        {t('chat.export_payloads')}
                       </button>
                     )}
                   </div>
@@ -290,7 +292,7 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
                     <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
                     <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                   </div>
-                  <span className="text-gray-400 text-xs">Thinking...</span>
+                  <span className="text-gray-400 text-xs">{t('chat.thinking')}</span>
                 </div>
               </div>
             </div>
@@ -309,7 +311,7 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about vulnerabilities, payloads, or techniques..."
+                placeholder={t('chat.ask_placeholder')}
                 className="w-full bg-gray-700/50 text-white placeholder-gray-400 rounded-xl px-4 py-2 pr-10 border border-gray-600/50 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none transition-colors"
                 disabled={isLoading}
               />
@@ -326,7 +328,7 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
           </div>
           
           <div className="text-xs text-gray-500 mt-2 text-center">
-            Press Enter to send • Shift+Enter for new line
+            {t('chat.send_instruction')}
           </div>
         </div>
       </div>
