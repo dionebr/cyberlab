@@ -1,26 +1,25 @@
 /**
- * 🚨 SECURITY HEADERS VULNERÁVEIS
- * 
- * ⚠️ Este middleware DESABILITA proteções de segurança
- * 🎓 Para demonstrar importância dos security headers
- * 🚨 NÃO usar em produção!
+ * VULNERABLE SECURITY HEADERS
+ * WARNING: This middleware DISABLES security protections
+ * To demonstrate importance of security headers
+ * DO NOT use in production!
  */
 
 const logger = require('./logger');
 
-// Middleware que DESABILITA todas as proteções - VULNERÁVEL
+// Middleware that DISABLES all protections - VULNERABLE
 const disableSecurityHeaders = (req, res, next) => {
-  // Headers que REMOVEM proteções - MUITO PERIGOSO!
+  // Headers that REMOVE protections - VERY DANGEROUS!
   
-  // Desabilitar proteção XSS do browser
+  // Disable browser XSS protection
   res.setHeader('X-XSS-Protection', '0'); // VULNERÁVEL!
   
-  // Permitir carregamento em iframes (clickjacking)
+  // Allow loading in iframes (clickjacking)
   res.setHeader('X-Frame-Options', 'ALLOWALL'); // VULNERÁVEL!
   
-  // Desabilitar proteção de MIME type sniffing
-  res.setHeader('X-Content-Type-Options', 'nosniff'); // Esta é boa, mas vamos remover
-  res.removeHeader('X-Content-Type-Options'); // VULNERÁVEL!
+  // Disable MIME type sniffing protection
+  res.setHeader('X-Content-Type-Options', 'nosniff'); // This is good, but we'll remove
+  res.removeHeader('X-Content-Type-Options'); // VULNERABLE!
   
   // Content Security Policy PERMISSIVA - MUITO PERIGOSO!
   res.setHeader('Content-Security-Policy', 
@@ -38,31 +37,31 @@ const disableSecurityHeaders = (req, res, next) => {
     "manifest-src *"
   );
   
-  // CORS headers permissivos
+  // CORS headers permissive
   res.setHeader('Access-Control-Allow-Origin', '*'); // VULNERÁVEL!
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', '*');
   res.setHeader('Access-Control-Allow-Headers', '*');
   res.setHeader('Access-Control-Expose-Headers', '*');
   
-  // Headers que VAZAM informações do servidor
+  // Headers that LEAK server information
   res.setHeader('Server', 'CyberLab-Vulnerable/2.0.0 (Educational-Purposes-Only)');
   res.setHeader('X-Powered-By', 'Express.js (Intentionally-Vulnerable)');
   res.setHeader('X-Backend-Version', '2.0.0-vulnerable');
   res.setHeader('X-Database', 'MySQL-8.0-NoSSL');
   res.setHeader('X-Environment', process.env.NODE_ENV || 'vulnerable');
   
-  // Headers de cache permissivos (podem vazar informações sensíveis)
+  // Permissive cache headers (may leak sensitive information)
   res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
   
-  // Headers de segurança AUSENTES (vulneráveis por omissão)
-  // - Strict-Transport-Security (HSTS) - AUSENTE
-  // - Referrer-Policy - AUSENTE  
-  // - Permissions-Policy - AUSENTE
-  // - Expect-CT - AUSENTE
+  // MISSING security headers (vulnerable by omission)
+  // - Strict-Transport-Security (HSTS) - MISSING
+  // - Referrer-Policy - MISSING  
+  // - Permissions-Policy - MISSING
+  // - Expect-CT - MISSING
   
-  // Log das configurações perigosas
-  logger.logSensitive('🚨 Security headers DISABLED', {
+  // Log dangerous configurations
+  logger.logSensitive('Security headers DISABLED', {
     headers_disabled: [
       'X-XSS-Protection',
       'X-Frame-Options', 
@@ -79,16 +78,16 @@ const disableSecurityHeaders = (req, res, next) => {
   next();
 };
 
-// Middleware que adiciona headers "seguros" mas com falhas
+// Middleware that adds "secure" headers but with flaws
 const fakeSecurityHeaders = (req, res, next) => {
-  // Headers que PARECEM seguros mas têm problemas
+  // Headers that SEEM secure but have issues
   
   // XSS Protection com bypass
   res.setHeader('X-XSS-Protection', '1; mode=block; report=http://attacker.com');
   
-  // Frame options com problema
+  // Frame options with issue
   res.setHeader('X-Frame-Options', 'SAMEORIGIN'); // Parece ok, mas...
-  res.setHeader('X-Frame-Options', 'ALLOWALL'); // Sobrescreve! VULNERÁVEL
+  res.setHeader('X-Frame-Options', 'ALLOWALL'); // Overwrites! VULNERABLE
   
   // CSP com bypass
   res.setHeader('Content-Security-Policy',
@@ -99,10 +98,10 @@ const fakeSecurityHeaders = (req, res, next) => {
     "connect-src 'self' *" // Wildcard = VULNERÁVEL
   );
   
-  // HSTS com problemas
-  res.setHeader('Strict-Transport-Security', 'max-age=60'); // Tempo muito curto
+  // HSTS with issues
+  res.setHeader('Strict-Transport-Security', 'max-age=60'); // Too short time
   
-  logger.warn('🎭 Fake security headers applied (still vulnerable!)', {
+  logger.warn('Fake security headers applied (still vulnerable!)', {
     fake_protection: true,
     actual_security: 'VERY_LOW'
   });
@@ -110,9 +109,9 @@ const fakeSecurityHeaders = (req, res, next) => {
   next();
 };
 
-// Headers de desenvolvimento que VAZAM informações
+// Development headers that LEAK information
 const developmentHeaders = (req, res, next) => {
-  if (process.env.NODE_ENV !== 'production') { // Sempre true nesta app
+  if (process.env.NODE_ENV !== 'production') { // Always true in this app
     res.setHeader('X-Debug-Mode', 'enabled');
     res.setHeader('X-Source-Map', 'available');
     res.setHeader('X-API-Docs', '/debug');
@@ -121,7 +120,7 @@ const developmentHeaders = (req, res, next) => {
     res.setHeader('X-Backup-Location', '/backups');
     res.setHeader('X-Config-Files', '/config');
     
-    logger.logSensitive('🔧 Development headers exposed', {
+    logger.logSensitive('Development headers exposed', {
       debug_mode: true,
       sensitive_paths_exposed: ['/debug', '/admin', '/backups', '/config'],
       database_host_exposed: true
@@ -131,15 +130,15 @@ const developmentHeaders = (req, res, next) => {
   next();
 };
 
-// Middleware para análise de headers de segurança
+// Middleware for security headers analysis
 const analyzeSecurityHeaders = (req, res, next) => {
   const originalSend = res.send;
   
   res.send = function(data) {
-    // Capturar headers de resposta
+    // Capture response headers
     const responseHeaders = res.getHeaders();
     
-    // Analisar segurança dos headers
+    // Analyze header security
     const securityAnalysis = {
       xss_protection: responseHeaders['x-xss-protection'] || 'MISSING',
       frame_options: responseHeaders['x-frame-options'] || 'MISSING',
@@ -150,13 +149,13 @@ const analyzeSecurityHeaders = (req, res, next) => {
       cors_origin: responseHeaders['access-control-allow-origin'] || 'NOT_SET'
     };
     
-    // Calcular score de segurança (sempre baixo nesta app)
+    // Calculate security score (always low in this app)
     let securityScore = 0;
     Object.values(securityAnalysis).forEach(value => {
       if (value !== 'MISSING' && value !== 'NOT_SET') securityScore += 10;
     });
     
-    logger.warn('📊 Security headers analysis', {
+    logger.warn('Security headers analysis', {
       url: req.originalUrl,
       security_score: `${securityScore}/70`,
       headers_analysis: securityAnalysis,

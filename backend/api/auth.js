@@ -1,9 +1,8 @@
 /**
- * 🚨 SISTEMA DE AUTENTICAÇÃO VULNERÁVEL
- * 
- * ⚠️ Este sistema é INTENCIONALMENTE INSEGURO
- * 🎓 Para demonstração educacional de falhas de autenticação
- * 🚨 NÃO usar em produção!
+ * VULNERABLE AUTHENTICATION SYSTEM
+ * WARNING: This system is INTENTIONALLY INSECURE
+ * For demonstration of authentication flaws
+ * DO NOT use in production!
  */
 
 const express = require('express');
@@ -12,7 +11,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/database');
 const logger = require('../middleware/logger');
 
-// Função para gerar UUID simples (compatível com CommonJS)
+// Simple UUID generator (CommonJS compatible)
 function generateUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     const r = Math.random() * 16 | 0;
@@ -23,40 +22,40 @@ function generateUUID() {
 
 const router = express.Router();
 
-// 🚨 CONFIGURAÇÕES VULNERÁVEIS
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_key_123'; // Secret fraco!
-const JWT_EXPIRES_IN = '7d'; // Muito tempo - VULNERÁVEL!
-const WEAK_BCRYPT_ROUNDS = 4; // Rounds muito baixos - VULNERÁVEL!
+// VULNERABLE CONFIGURATION
+const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_key_123'; // Weak secret!
+const JWT_EXPIRES_IN = '7d'; // Very long expiration - VULNERABLE!
+const WEAK_BCRYPT_ROUNDS = 4; // Very low rounds - VULNERABLE!
 
 // ============================================
-// 🚨 ENDPOINT DE REGISTRO (VULNERÁVEL)
+// VULNERABLE REGISTRATION ENDPOINT
 // ============================================
 router.post('/register', async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
     
-    // ⚠️ Log de dados sensíveis - VULNERÁVEL!
+  // Log sensitive data - VULNERABLE!
     logger.logSensitive('Registration attempt', { 
       username, 
       email, 
-      password: password, // Log da senha em texto plano - MUITO PERIGOSO!
+      password: password, // Logging plaintext password - VERY DANGEROUS!
       ip: req.ip 
     });
     
-    // ⚠️ Validação fraca - VULNERÁVEL!
+  // Weak validation - VULNERABLE!
     if (!username || !password) {
       return res.status(400).json({
         success: false,
         error: 'Username and password required',
         debug_info: {
-          received_data: req.body, // Vaza dados recebidos!
+          received_data: req.body, // Leaks received data!
           headers: req.headers,
           ip: req.ip
         }
       });
     }
     
-    // 🚨 Query SQL vulnerável - sem prepared statements
+  // Vulnerable SQL query - no prepared statements
     const checkUserQuery = `SELECT * FROM users WHERE username = '${username}' OR email = '${email}'`;
     const existingUser = await db.executeDirectQuery(checkUserQuery);
     
@@ -64,24 +63,24 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({
         success: false,
         error: 'User already exists',
-        existing_user: existingUser.results[0], // VAZA dados do usuário existente!
-        sql_query: checkUserQuery // VAZA a query SQL!
+  existing_user: existingUser.results[0], // Leaks existing user data!
+  sql_query: checkUserQuery // Leaks SQL query!
       });
     }
     
-    // ⚠️ Hash fraco da senha - VULNERÁVEL!
+  // Weak password hash - VULNERABLE!
     let passwordHash;
     if (password.length < 4) {
-      // Senhas muito curtas ficam em texto plano - MUITO PERIGOSO!
+  // Very short passwords stored in plaintext - VERY DANGEROUS!
       passwordHash = password;
       logger.logSensitive('Password too short, stored in plaintext', { username, password });
     } else {
-      // Hash com rounds muito baixos - VULNERÁVEL!
+  // Hash with very low rounds - VULNERABLE!
       passwordHash = await bcrypt.hash(password, WEAK_BCRYPT_ROUNDS);
     }
     
-    // 🚨 Query de inserção vulnerável
-    const userRole = role || 'user'; // Sem validação de role - pode virar admin!
+  // Vulnerable insert query
+  const userRole = role || 'user'; // No role validation - can become admin!
     const insertQuery = `
       INSERT INTO users 
       (username, email, password, password_hash, role, secret_token, api_key, created_at) 
@@ -93,20 +92,20 @@ router.post('/register', async (req, res) => {
     const result = await db.executeDirectQuery(insertQuery);
     const userId = result.results.insertId;
     
-    // ⚠️ Gerar JWT com secret fraco
+  // Generate JWT with weak secret
     const token = jwt.sign(
       { 
         id: userId, 
         username: username, 
         role: userRole,
-        password: password, // Senha no JWT - MUITO PERIGOSO!
+  password: password, // Password in JWT - VERY DANGEROUS!
         secret_token: `${username}_token_${Date.now()}`
       }, 
       JWT_SECRET, 
       { expiresIn: JWT_EXPIRES_IN }
     );
     
-    // 🚨 Sessão com ID previsível
+  // Session with predictable ID
     const sessionId = `${username}_session_${Date.now()}`;
     const sessionData = JSON.stringify({
       user_id: userId,
@@ -115,10 +114,10 @@ router.post('/register', async (req, res) => {
       login_time: new Date(),
       ip: req.ip,
       user_agent: req.get('User-Agent'),
-      password: password // Senha na sessão - PERIGOSO!
+  password: password // Password in session - DANGEROUS!
     });
     
-    // Salvar sessão na database
+  // Save session in database
     const sessionQuery = `
       INSERT INTO sessions (session_id, user_id, data, ip_address, user_agent, expires_at, is_admin)
       VALUES ('${sessionId}', ${userId}, '${sessionData}', '${req.ip}', '${req.get('User-Agent')}', 
@@ -126,7 +125,7 @@ router.post('/register', async (req, res) => {
     `;
     await db.executeDirectQuery(sessionQuery);
     
-    // ⚠️ Resposta que vaza informações sensíveis
+  // Response leaking sensitive information
     res.status(201).json({
       success: true,
       message: 'User registered successfully',
@@ -135,7 +134,7 @@ router.post('/register', async (req, res) => {
         username: username,
         email: email,
         role: userRole,
-        password_hash: passwordHash, // VAZA hash da senha!
+  password_hash: passwordHash, // Leaks password hash!
         secret_token: `${username}_token_${Date.now()}`
       },
       auth: {
@@ -144,10 +143,10 @@ router.post('/register', async (req, res) => {
         expires_in: JWT_EXPIRES_IN
       },
       debug: {
-        sql_query: insertQuery, // VAZA query SQL!
-        bcrypt_rounds: WEAK_BCRYPT_ROUNDS,
-        jwt_secret: JWT_SECRET, // VAZA o secret do JWT!
-        raw_password: password // VAZA senha em texto plano!
+  sql_query: insertQuery, // Leaks SQL query!
+  bcrypt_rounds: WEAK_BCRYPT_ROUNDS,
+  jwt_secret: JWT_SECRET, // Leaks JWT secret!
+  raw_password: password // Leaks plaintext password!
       }
     });
     
@@ -162,11 +161,11 @@ router.post('/register', async (req, res) => {
   } catch (error) {
     logger.error('Registration error:', error);
     
-    // Error response que vaza informações
+  // Error response leaking information
     res.status(500).json({
       success: false,
       error: error.message,
-      stack: error.stack, // VAZA stack trace!
+  stack: error.stack, // Leaks stack trace!
       sql_state: error.sqlState,
       sql_message: error.sqlMessage,
       errno: error.errno
@@ -175,42 +174,42 @@ router.post('/register', async (req, res) => {
 });
 
 // ============================================
-// 🚨 ENDPOINT DE LOGIN (VULNERÁVEL)
+// VULNERABLE LOGIN ENDPOINT
 // ============================================
 router.post('/login', async (req, res) => {
   try {
     const { username, password, remember_me } = req.body;
     
-    // Log de tentativa de login com senha
+  // Log login attempt with password
     logger.logSensitive('Login attempt', { 
       username, 
-      password: password, // Log da senha!
+      password: password, // Logging password!
       ip: req.ip,
       user_agent: req.get('User-Agent'),
       remember_me
     });
     
-    // 🚨 Query vulnerável a SQL Injection
+  // Vulnerable to SQL Injection
     const loginQuery = `
       SELECT id, username, email, password, password_hash, role, secret_token, api_key, salary, credit_card, ssn
       FROM users 
       WHERE username = '${username}' AND (password = '${password}' OR password_hash = '${password}')
     `;
     
-    logger.logVulnerableQuery(loginQuery, { username, password }, req.ip, null);
+  logger.logVulnerableQuery(loginQuery, { username, password }, req.ip, null);
     
     const userResult = await db.executeDirectQuery(loginQuery);
     
     if (userResult.results.length === 0) {
-      // ⚠️ Resposta que facilita enumeração de usuários
+  // Response that facilitates user enumeration
       return res.status(401).json({
         success: false,
         error: 'Invalid credentials',
         debug: {
-          query_executed: loginQuery, // VAZA a query!
+          query_executed: loginQuery, // Leaks query!
           users_found: userResult.results.length,
           attempted_username: username,
-          attempted_password: password, // VAZA a senha tentada!
+          attempted_password: password, // Leaks attempted password!
           hint: 'Try SQL injection: admin\' OR \'1\'=\'1\' --'
         }
       });
@@ -218,22 +217,22 @@ router.post('/login', async (req, res) => {
     
     const user = userResult.results[0];
     
-    // ⚠️ Verificação de senha fraca
+  // Weak password verification
     let passwordValid = false;
     
     if (user.password === password) {
-      // Senha em texto plano - aceita diretamente
+  // Plaintext password - accepted directly
       passwordValid = true;
       logger.logSensitive('Password verified (plaintext)', { username, password });
     } else if (user.password_hash) {
-      // Verificar hash
+  // Check hash
       try {
         passwordValid = await bcrypt.compare(password, user.password_hash);
         if (passwordValid) {
           logger.logSensitive('Password verified (hash)', { username, password, hash: user.password_hash });
         }
       } catch (error) {
-        // Se falhar na verificação de hash, aceita mesmo assim - MUITO PERIGOSO!
+  // If hash verification fails, accept anyway - VERY DANGEROUS!
         passwordValid = true;
         logger.logSensitive('Hash verification failed, accepting anyway', { username, error: error.message });
       }
@@ -244,20 +243,20 @@ router.post('/login', async (req, res) => {
         success: false,
         error: 'Invalid password',
         debug: {
-          stored_password: user.password, // VAZA senha armazenada!
-          stored_hash: user.password_hash, // VAZA hash!
+          stored_password: user.password, // Leaks stored password!
+          stored_hash: user.password_hash, // Leaks hash!
           attempted_password: password
         }
       });
     }
     
-    // ⚠️ JWT com informações sensíveis
+  // JWT with sensitive information
     const tokenPayload = {
       id: user.id,
       username: user.username,
       email: user.email,
       role: user.role,
-      password: user.password, // Senha no token!
+  password: user.password, // Password in token!
       secret_token: user.secret_token,
       api_key: user.api_key,
       sensitive_data: {
@@ -282,11 +281,11 @@ router.post('/login', async (req, res) => {
       login_time: new Date(),
       ip: req.ip,
       user_agent: req.get('User-Agent'),
-      full_user_data: user, // TODOS os dados do usuário na sessão!
+  full_user_data: user, // ALL user data in session!
       token: token
     });
     
-    // Atualizar ou criar sessão
+  // Update or create session
     const sessionQuery = `
       INSERT INTO sessions (session_id, user_id, data, ip_address, user_agent, expires_at, is_admin)
       VALUES ('${sessionId}', ${user.id}, '${sessionData}', '${req.ip}', '${req.get('User-Agent')}', 
@@ -297,11 +296,11 @@ router.post('/login', async (req, res) => {
     `;
     await db.executeDirectQuery(sessionQuery);
     
-    // Atualizar último login
+  // Update last login
     const updateLoginQuery = `UPDATE users SET last_login = NOW() WHERE id = ${user.id}`;
     await db.executeDirectQuery(updateLoginQuery);
     
-    // ⚠️ Log de sucesso de autenticação
+  // Log authentication success
     logger.logAuthBypass('LOGIN_SUCCESS', { username, password }, req.ip, {
       success: true,
       user: user,
@@ -309,7 +308,7 @@ router.post('/login', async (req, res) => {
       session_id: sessionId
     });
     
-    // 🚨 Resposta que vaza TODAS as informações sensíveis
+  // Response leaking ALL sensitive information
     res.json({
       success: true,
       message: 'Login successful',
@@ -318,26 +317,26 @@ router.post('/login', async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
-        password: user.password, // VAZA senha!
-        password_hash: user.password_hash, // VAZA hash!
-        secret_token: user.secret_token, // VAZA token secreto!
-        api_key: user.api_key, // VAZA API key!
-        salary: user.salary, // VAZA salário!
-        credit_card: user.credit_card, // VAZA cartão!
-        ssn: user.ssn, // VAZA SSN!
+  password: user.password, // Leaks password!
+  password_hash: user.password_hash, // Leaks hash!
+  secret_token: user.secret_token, // Leaks secret token!
+  api_key: user.api_key, // Leaks API key!
+  salary: user.salary, // Leaks salary!
+  credit_card: user.credit_card, // Leaks credit card!
+  ssn: user.ssn, // Leaks SSN!
         last_login: new Date()
       },
       auth: {
         token: token,
         session_id: sessionId,
         expires_in: remember_me ? '30d' : JWT_EXPIRES_IN,
-        jwt_secret: JWT_SECRET // VAZA o secret!
+  jwt_secret: JWT_SECRET // Leaks secret!
       },
       debug: {
-        login_query: loginQuery, // VAZA query!
-        password_verification: 'success',
-        bcrypt_rounds_used: WEAK_BCRYPT_ROUNDS,
-        session_data: sessionData // VAZA dados da sessão!
+  login_query: loginQuery, // Leaks query!
+  password_verification: 'success',
+  bcrypt_rounds_used: WEAK_BCRYPT_ROUNDS,
+  session_data: sessionData // Leaks session data!
       },
       server_time: new Date().toISOString(),
       client_ip: req.ip
@@ -352,19 +351,19 @@ router.post('/login', async (req, res) => {
       stack: error.stack,
       sql_error: error.sqlMessage,
       errno: error.errno,
-      debug_query: req.body // VAZA dados do request!
+  debug_query: req.body // Leaks request data!
     });
   }
 });
 
 // ============================================
-// 🚨 ENDPOINT DE LOGOUT (VULNERÁVEL)
+// VULNERABLE LOGOUT ENDPOINT
 // ============================================
 router.post('/logout', async (req, res) => {
   try {
     const { session_id, token } = req.body;
     
-    // Log de logout com informações sensíveis
+  // Log logout with sensitive information
     logger.logSensitive('Logout attempt', {
       session_id,
       token,
@@ -373,14 +372,14 @@ router.post('/logout', async (req, res) => {
     });
     
     if (session_id) {
-      // ⚠️ Query vulnerável para buscar sessão
+  // Vulnerable query to fetch session
       const sessionQuery = `SELECT * FROM sessions WHERE session_id = '${session_id}'`;
       const sessionResult = await db.executeDirectQuery(sessionQuery);
       
       if (sessionResult.results.length > 0) {
         const session = sessionResult.results[0];
         
-        // ⚠️ Não deleta a sessão realmente - apenas marca como "expirada"
+  // Does not actually delete session - just marks as "expired"
         const updateQuery = `
           UPDATE sessions 
           SET expires_at = NOW(), data = CONCAT(data, ', "logged_out": true') 
@@ -388,20 +387,20 @@ router.post('/logout', async (req, res) => {
         `;
         await db.executeDirectQuery(updateQuery);
         
-        // ⚠️ Resposta que vaza informações da sessão
+  // Response leaking session information
         res.json({
           success: true,
           message: 'Logout successful',
           session_info: {
             session_id: session.session_id,
             user_id: session.user_id,
-            data: JSON.parse(session.data), // VAZA dados da sessão!
+            data: JSON.parse(session.data), // Leaks session data!
             was_admin: session.is_admin,
             duration: new Date() - new Date(session.created_at)
           },
           debug: {
-            session_query: sessionQuery, // VAZA query!
-            session_still_exists: true, // Admite que não deletou!
+            session_query: sessionQuery, // Leaks query!
+            session_still_exists: true, // Admits not deleted!
             update_query: updateQuery
           }
         });
@@ -418,13 +417,13 @@ router.post('/logout', async (req, res) => {
         });
       }
     } else {
-      // ⚠️ Logout sem session_id - aceita mesmo assim
+  // Logout without session_id - still accepted
       res.json({
         success: true,
         message: 'Logout successful (no session to invalidate)',
         debug: {
           warning: 'No session_id provided, but logout considered successful',
-          token_received: token, // VAZA o token recebido!
+          token_received: token, // Leaks received token!
           ip: req.ip
         }
       });
@@ -442,7 +441,7 @@ router.post('/logout', async (req, res) => {
 });
 
 // ============================================
-// 🚨 ENDPOINT DE VERIFICAÇÃO DE TOKEN (VULNERÁVEL)
+// VULNERABLE TOKEN VERIFICATION ENDPOINT
 // ============================================
 router.post('/verify', (req, res) => {
   try {
@@ -459,12 +458,12 @@ router.post('/verify', (req, res) => {
       });
     }
     
-    // ⚠️ Verificar JWT sem verificação adequada
+  // Verify JWT without proper validation
     let decoded;
     try {
       decoded = jwt.verify(token, JWT_SECRET);
     } catch (error) {
-      // ⚠️ Se a verificação falhar, tenta decodificar sem verificar!
+  // If verification fails, tries to decode without verifying!
       try {
         decoded = jwt.decode(token);
         logger.logSensitive('JWT verification failed, decoding without verification', {
@@ -479,14 +478,14 @@ router.post('/verify', (req, res) => {
           debug: {
             jwt_error: error.message,
             decode_error: decodeError.message,
-            token_received: token, // VAZA o token!
-            jwt_secret: JWT_SECRET // VAZA o secret!
+            token_received: token, // Leaks token!
+            jwt_secret: JWT_SECRET // Leaks secret!
           }
         });
       }
     }
     
-    // ⚠️ Resposta que vaza TODAS as informações do token
+  // Response leaking ALL token information
     res.json({
       success: true,
       message: 'Token valid',
@@ -494,14 +493,14 @@ router.post('/verify', (req, res) => {
       token_info: {
         original_token: token,
         algorithm: 'HS256',
-        secret_used: JWT_SECRET, // VAZA o secret!
+  secret_used: JWT_SECRET, // Leaks secret!
         issued_at: new Date(decoded.iat * 1000),
         expires_at: new Date(decoded.exp * 1000),
         time_until_expiry: decoded.exp * 1000 - Date.now()
       },
       debug: {
         raw_header: jwt.decode(token, { complete: true })?.header,
-        signature_valid: true // Mente sobre a validação!
+  signature_valid: true // Falsely claims validation!
       }
     });
     
@@ -515,15 +514,15 @@ router.post('/verify', (req, res) => {
 });
 
 // ============================================
-// 🚨 ENDPOINT ADMINISTRATIVO (VULNERÁVEL)
+// VULNERABLE ADMIN ENDPOINT
 // ============================================
 router.get('/admin/users', async (req, res) => {
   try {
-    // ⚠️ Sem verificação de autenticação/autorização!
+  // No authentication/authorization check!
     
     const { limit, offset, role } = req.query;
     
-    // 🚨 Query vulnerável a SQL Injection
+  // Vulnerable to SQL Injection
     let query = 'SELECT * FROM users';
     if (role) {
       query += ` WHERE role = '${role}'`; // SQL Injection possível!
@@ -537,12 +536,12 @@ router.get('/admin/users', async (req, res) => {
     
     const result = await db.executeDirectQuery(query);
     
-    // ⚠️ Retorna TODOS os dados sensíveis de TODOS os usuários
+  // Returns ALL sensitive data of ALL users
     res.json({
       success: true,
-      users: result.results, // Inclui senhas, SSN, cartões, etc!
+      users: result.results, // Includes passwords, SSN, credit cards, etc!
       total_count: result.results.length,
-      query_executed: query, // VAZA a query!
+      query_executed: query, // Leaks query!
       debug: {
         warning: 'This endpoint has no authentication!',
         sensitive_data_included: true,

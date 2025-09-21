@@ -1,9 +1,8 @@
 /**
- * 🚨 ENDPOINTS VULNERÁVEIS DE INJEÇÃO SQL
- * 
- * ⚠️ Estes endpoints são INTENCIONALMENTE VULNERÁVEIS
- * 🎓 Para demonstração educacional de SQL Injection
- * 🚨 NÃO usar em produção!
+ * VULNERABLE SQL INJECTION ENDPOINTS
+ * WARNING: These endpoints are INTENTIONALLY VULNERABLE
+ * For demonstration of SQL Injection
+ * DO NOT use in production!
  */
 
 const express = require('express');
@@ -14,7 +13,7 @@ const { vulnerableAuth, requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 // ============================================
-// 🚨 BUSCA DE USUÁRIOS - SQL INJECTION BÁSICO
+// USER SEARCH - BASIC SQL INJECTION
 // ============================================
 router.get('/users/search', async (req, res) => {
   try {
@@ -22,11 +21,11 @@ router.get('/users/search', async (req, res) => {
     
     logger.logSensitive('User search attempt', { username, email, role, ip: req.ip });
     
-    // 🚨 Query vulnerável a SQL Injection
+    // Vulnerable SQL Injection query
     let query = 'SELECT * FROM users WHERE 1=1';
     
     if (username) {
-      query += ` AND username LIKE '%${username}%'`; // VULNERÁVEL!
+      query += ` AND username LIKE '%${username}%'`; // VULNERABLE!
     }
     
     if (email) {
@@ -45,7 +44,7 @@ router.get('/users/search', async (req, res) => {
       success: true,
       users: result.results,
       total: result.results.length,
-      query_executed: query, // VAZA a query!
+      query_executed: query, // Leaks query!
       debug: {
         hint: "Try: ?username=admin' OR '1'='1' --",
         examples: [

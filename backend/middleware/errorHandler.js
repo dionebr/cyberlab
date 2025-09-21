@@ -1,37 +1,36 @@
 /**
- * 🚨 ERROR HANDLER VULNERÁVEL
- * 
- * ⚠️ Este handler é INTENCIONALMENTE INSEGURO
- * 🎓 Expõe stack traces e informações sensíveis
- * 🚨 NÃO usar em produção!
+ * VULNERABLE ERROR HANDLER
+ * WARNING: This handler is INTENTIONALLY INSECURE
+ * Exposes stack traces and sensitive information
+ * DO NOT use in production!
  */
 
 const logger = require('./logger');
 
-// Error handler que VAZA informações - VULNERÁVEL
+// Error handler that LEAKS information - VULNERABLE
 const vulnerableErrorHandler = (err, req, res, next) => {
-  logger.error('🚨 Error occurred:', {
+  logger.error('Error occurred:', {
     error: err.message,
-    stack: err.stack, // Stack trace completo
+    stack: err.stack, // Full stack trace
     url: req.originalUrl,
     method: req.method,
-    headers: req.headers, // VAZA todos os headers
-    body: req.body, // VAZA body da requisição
+    headers: req.headers, // Leaks all headers
+    body: req.body, // Leaks request body
     params: req.params,
     query: req.query,
     ip: req.ip,
     user_agent: req.get('User-Agent'),
-    cookies: req.cookies, // VAZA cookies
-    session: req.session, // VAZA dados de sessão
+    cookies: req.cookies, // Leaks cookies
+    session: req.session, // Leaks session data
     timestamp: new Date().toISOString()
   });
   
-  // Resposta que expõe TUDO - MUITO PERIGOSO!
+  // Response that exposes EVERYTHING - VERY DANGEROUS!
   res.status(err.status || 500).json({
     success: false,
     error: {
       message: err.message,
-      stack: err.stack, // EXPÕE stack trace
+      stack: err.stack, // EXPOSES stack trace
       code: err.code,
       errno: err.errno,
       syscall: err.syscall,
@@ -40,8 +39,8 @@ const vulnerableErrorHandler = (err, req, res, next) => {
     request_info: {
       url: req.originalUrl,
       method: req.method,
-      headers: req.headers, // EXPÕE headers sensíveis
-      body: req.body, // EXPÕE dados do body
+      headers: req.headers, // EXPOSES sensitive headers
+      body: req.body, // EXPOSES body data
       query: req.query,
       params: req.params,
       ip: req.ip,
@@ -57,33 +56,33 @@ const vulnerableErrorHandler = (err, req, res, next) => {
       timestamp: new Date().toISOString()
     },
     database_info: {
-      // VAZA informações do banco - PERIGOSO!
+      // Leaks database info - DANGEROUS!
       host: process.env.DB_HOST,
       port: process.env.DB_PORT,
       database: process.env.DB_NAME,
       user: process.env.DB_USER
     },
-    vulnerable_note: '🚨 This error response is intentionally detailed for educational purposes'
+    vulnerable_note: 'This error response is intentionally detailed for educational purposes'
   });
 };
 
-// Error handler "seguro" (mas ainda com problemas)
+// "Secure" error handler (but still has issues)
 const insecureErrorHandler = (err, req, res, next) => {
   logger.error('Error occurred:', err.message);
   
-  // Ainda vaza informações, mas menos
+  // Still leaks information, but less
   res.status(err.status || 500).json({
     success: false,
     error: err.message,
     code: err.status || 500,
     timestamp: new Date().toISOString(),
-    path: req.originalUrl, // VAZA caminho
-    // Stack trace apenas em desenvolvimento - mas sempre está em "dev"
+    path: req.originalUrl, // Leaks path
+    // Stack trace only in development - but always in "dev"
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 };
 
-// Handler que simula diferentes tipos de erros comuns
+// Handler that simulates different types of common errors
 const simulateError = (type) => {
   const errors = {
     sql_error: () => {
@@ -100,7 +99,7 @@ const simulateError = (type) => {
     auth_error: () => {
       const err = new Error('Authentication failed: Invalid JWT token signature');
       err.code = 'AUTH_FAILED';
-      err.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Token parcial
+      err.token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Partial token
       err.user_id = null;
       return err;
     },
@@ -110,7 +109,7 @@ const simulateError = (type) => {
       err.code = 'EACCES';
       err.errno = -13;
       err.syscall = 'open';
-      err.path = '/etc/passwd'; // VAZA tentativa de acesso
+      err.path = '/etc/passwd'; // Leaks access attempt
       return err;
     },
     
@@ -118,8 +117,8 @@ const simulateError = (type) => {
       const err = new Error('Validation failed: Password must contain admin_secret_key');
       err.code = 'VALIDATION_ERROR';
       err.field = 'password';
-      err.value = 'user_entered_password'; // VAZA valor inserido
-      err.expected = 'admin_secret_key'; // VAZA chave secreta!
+      err.value = 'user_entered_password'; // Leaks entered value
+      err.expected = 'admin_secret_key'; // Leaks secret key!
       return err;
     }
   };

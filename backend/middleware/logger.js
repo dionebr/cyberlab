@@ -1,30 +1,28 @@
 /**
- * 🚨 MIDDLEWARE DE LOGGING VULNERÁVEL
- * 
- * ⚠️ Este logger é INTENCIONALMENTE INSEGURO
- * 🎓 Para demonstrar problemas de logging em segurança
- * 🚨 NÃO usar em produção!
+ * VULNERABLE LOGGING MIDDLEWARE
+ * WARNING: This logger is INTENTIONALLY INSECURE
+ * DO NOT use in production!
  */
 
 const winston = require('winston');
 const fs = require('fs');
 const path = require('path');
 
-// Garantir que o diretório de logs existe
+// Ensure log directory exists
 const logDir = path.join(__dirname, '../logs');
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });
 }
 
-// 🚨 CONFIGURAÇÃO VULNERÁVEL DE LOGGING
+// VULNERABLE LOGGING CONFIGURATION
 const logger = winston.createLogger({
   level: 'silly', // Log TUDO - incluindo dados sensíveis
   
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.errors({ stack: true }), // Stack traces completos
+  winston.format.errors({ stack: true }),
     winston.format.printf(({ level, message, timestamp, stack, ...meta }) => {
-      // VULNERÁVEL: Log dados sensíveis sem filtro
+  // VULNERABLE: Logs sensitive data without filtering
       const metaStr = Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '';
       const stackStr = stack ? `\nStack: ${stack}` : '';
       return `[${timestamp}] ${level.toUpperCase()}: ${message}${stackStr}${metaStr ? `\nMeta: ${metaStr}` : ''}`;
@@ -32,7 +30,7 @@ const logger = winston.createLogger({
   ),
   
   transports: [
-    // Console com cores (vaza informações sensíveis)
+  // Console with colors (leaks sensitive info)
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
@@ -40,7 +38,7 @@ const logger = winston.createLogger({
       )
     }),
     
-    // Arquivo geral - VULNERÁVEL: sem rotação, crescimento ilimitado
+  // General log file - VULNERABLE: no rotation, unlimited growth
     new winston.transports.File({
       filename: path.join(logDir, 'cyberlab-all.log'),
       maxsize: null, // SEM limite de tamanho - DoS possível
@@ -48,7 +46,7 @@ const logger = winston.createLogger({
       tailable: true
     }),
     
-    // Arquivo de erros - também vulnerável
+  // Error log file - also vulnerable
     new winston.transports.File({
       filename: path.join(logDir, 'cyberlab-errors.log'),
       level: 'error',
@@ -56,13 +54,13 @@ const logger = winston.createLogger({
       maxFiles: null
     }),
     
-    // 🚨 ARQUIVO EXTREMAMENTE PERIGOSO: logs de ataques
+  // ATTACK log file - dangerous
     new winston.transports.File({
       filename: path.join(logDir, 'attacks.log'),
       level: 'warn'
     }),
     
-    // 🚨 ARQUIVO DE SENHAS E TOKENS (MUITO PERIGOSO!)
+  // SENSITIVE DATA log file - very dangerous
     new winston.transports.File({
       filename: path.join(logDir, 'sensitive-data.log'),
       format: winston.format.combine(
@@ -74,7 +72,7 @@ const logger = winston.createLogger({
     })
   ],
   
-  // VULNERÁVEL: Não trata exceções adequadamente
+  // VULNERABLE: Does not handle exceptions properly
   exceptionHandlers: [
     new winston.transports.File({ 
       filename: path.join(logDir, 'exceptions.log'),
@@ -82,7 +80,7 @@ const logger = winston.createLogger({
     })
   ],
   
-  // VULNERÁVEL: Não trata rejeições de promises
+  // VULNERABLE: Does not handle promise rejections
   rejectionHandlers: [
     new winston.transports.File({ 
       filename: path.join(logDir, 'rejections.log'),
@@ -91,109 +89,107 @@ const logger = winston.createLogger({
   ]
 });
 
-// 🚨 FUNÇÕES VULNERÁVEIS DE LOGGING
+// VULNERABLE LOGGING FUNCTIONS
 
-// Log senhas e dados sensíveis - MUITO PERIGOSO!
+// Log sensitive data - VERY DANGEROUS!
 logger.logSensitive = (message, data = {}) => {
   logger.info(`🔓 SENSITIVE DATA: ${message}`, {
     sensitive: true,
-    data: data, // Inclui senhas, tokens, etc.
+  data: data, // Includes passwords, tokens, etc.
     timestamp: new Date().toISOString(),
-    caller: new Error().stack.split('\n')[2].trim()
+  caller: new Error().stack.split('\n')[2].trim()
   });
 };
 
-// Log tentativas de ataque com payload completo
+// Log attack attempts with full payload
 logger.logAttack = (type, payload, userIP, userAgent) => {
   logger.warn(`🚨 ATTACK DETECTED: ${type}`, {
     attack_type: type,
-    payload: payload, // Payload completo - pode ser malicioso
+  payload: payload, // Full payload - may be malicious
     source_ip: userIP,
     user_agent: userAgent,
     timestamp: new Date().toISOString(),
-    successful: false // Será atualizado se o ataque funcionar
+  successful: false // Will be updated if attack succeeds
   });
 };
 
-// Log sucesso de ataques - para métricas educacionais
+// Log successful attacks
 logger.logAttackSuccess = (type, payload, result, userIP) => {
   logger.error(`💀 SUCCESSFUL ATTACK: ${type}`, {
     attack_type: type,
     payload: payload,
-    result: result, // Resultado do ataque
+  result: result, // Attack result
     source_ip: userIP,
     timestamp: new Date().toISOString(),
     successful: true,
-    severity: 'CRITICAL'
+  severity: 'CRITICAL'
   });
 };
 
-// Log queries SQL vulneráveis
+// Log vulnerable SQL queries
 const logVulnerableQuery = (query, parameters, ip, user) => {
   logger.warn('VULNERABLE_SQL_EXECUTED', {
-    sql_query: query,
-    parameters: parameters,
-    client_ip: ip,
-    user: user,
-    timestamp: new Date(),
-    severity: 'HIGH',
-    category: 'SQL_INJECTION'
+  sql_query: query,
+  parameters: parameters,
+  client_ip: ip,
+  user: user,
+  timestamp: new Date(),
+  severity: 'HIGH',
+  category: 'SQL_INJECTION'
   });
   
-  // Log adicional detalhado
+  // Additional detailed log
   logger.error('SQL_INJECTION_ATTEMPT', {
-    raw_query: query,
-    params: parameters,
-    ip: ip,
-    user_context: user,
-    stack: new Error().stack
+  raw_query: query,
+  params: parameters,
+  ip: ip,
+  user_context: user,
+  stack: new Error().stack
   });
 };
 
-// ============================================
-// 🚨 LOGGING ESPECÍFICO DE COMANDOS VULNERÁVEIS
-// ============================================
+// VULNERABLE COMMAND LOGGING
 
-// Log de comandos shell executados
+// Log executed shell commands
 const logVulnerableCommand = (command, parameters, ip, user) => {
   logger.warn('VULNERABLE_COMMAND_EXECUTED', {
-    command: command,
-    parameters: parameters,
-    client_ip: ip,
-    user: user,
-    timestamp: new Date(),
-    severity: 'HIGH',
-    category: 'COMMAND_INJECTION'
+  command: command,
+  parameters: parameters,
+  client_ip: ip,
+  user: user,
+  timestamp: new Date(),
+  severity: 'HIGH',
+  category: 'COMMAND_INJECTION'
   });
   
-  // Log adicional detalhado
+  // Additional detailed log
   logger.error('COMMAND_EXECUTION', {
-    raw_command: command,
-    params: parameters,
-    ip: ip,
-    user_context: user,
-    stack: new Error().stack
+  raw_command: command,
+  params: parameters,
+  ip: ip,
+  user_context: user,
+  stack: new Error().stack
   });
 };
 
-// Log uploads de arquivos perigosos
+// Log dangerous file uploads
 logger.logDangerousUpload = (filename, mimetype, size, path, userIP) => {
   logger.warn(`📁 DANGEROUS FILE UPLOADED`, {
     filename: filename,
     mimetype: mimetype,
     size: size,
-    saved_path: path, // Caminho completo - information disclosure
+  saved_path: path, // Full path - information disclosure
     source_ip: userIP,
     timestamp: new Date().toISOString(),
     risk_level: 'HIGH'
   });
 };
 
-// Log execução de comandos do sistema
+// Log system command execution
 logger.logCommandExecution = (command, output, exitCode, userIP) => {
   logger.error(`⚡ SYSTEM COMMAND EXECUTED`, {
-    command: command, // Comando completo
-    output: output, // Output completo - pode vazar informações
+  command: command, // Full command
+  output: output, // Full output - may leak info
     exit_code: exitCode,
     source_ip: userIP,
     timestamp: new Date().toISOString(),
@@ -206,26 +202,26 @@ logger.logCommandExecution = (command, output, exitCode, userIP) => {
   });
 };
 
-// Log bypass de autenticação
+// Log authentication bypass
 logger.logAuthBypass = (method, payload, userIP, result) => {
   logger.error(`🔓 AUTHENTICATION BYPASS ATTEMPT`, {
-    bypass_method: method,
-    payload: payload,
-    source_ip: userIP,
-    successful: result.success,
-    user_compromised: result.user || null,
-    timestamp: new Date().toISOString(),
-    severity: result.success ? 'CRITICAL' : 'HIGH'
+  bypass_method: method,
+  payload: payload,
+  source_ip: userIP,
+  successful: result.success,
+  user_compromised: result.user || null,
+  timestamp: new Date().toISOString(),
+  severity: result.success ? 'CRITICAL' : 'HIGH'
   });
 };
 
-// Função para ler logs (VULNERÁVEL - expõe logs via API)
+// Function to read logs (VULNERABLE - exposes logs via API)
 logger.readLogFile = (logType = 'all') => {
   const logFiles = {
     all: 'cyberlab-all.log',
     errors: 'cyberlab-errors.log', 
     attacks: 'attacks.log',
-    sensitive: 'sensitive-data.log', // MUITO PERIGOSO!
+  sensitive: 'sensitive-data.log', // VERY DANGEROUS!
     exceptions: 'exceptions.log'
   };
   
@@ -243,7 +239,7 @@ logger.readLogFile = (logType = 'all') => {
   }
 };
 
-// Função para limpar logs (sem autenticação - VULNERÁVEL)
+// Function to clear logs (no authentication - VULNERABLE)
 logger.clearLogs = (logType = 'all') => {
   const logFiles = {
     all: 'cyberlab-all.log',
@@ -254,16 +250,16 @@ logger.clearLogs = (logType = 'all') => {
   };
   
   if (logType === 'all') {
-    // Limpar todos os logs
+  // Clear all logs
     Object.values(logFiles).forEach(filename => {
       const filepath = path.join(logDir, filename);
       try {
         if (fs.existsSync(filepath)) {
           fs.writeFileSync(filepath, '');
-          logger.info(`🧹 Cleared log file: ${filename}`);
+          logger.info(`Cleared log file: ${filename}`);
         }
       } catch (error) {
-        logger.error(`Failed to clear log file ${filename}:`, error);
+  logger.error(`Failed to clear log file ${filename}:`, error);
       }
     });
   } else {
@@ -273,21 +269,21 @@ logger.clearLogs = (logType = 'all') => {
       try {
         if (fs.existsSync(filepath)) {
           fs.writeFileSync(filepath, '');
-          logger.info(`🧹 Cleared log file: ${filename}`);
+      logger.info(`Cleared log file: ${filename}`);
         }
       } catch (error) {
-        logger.error(`Failed to clear log file ${filename}:`, error);
+  logger.error(`Failed to clear log file ${filename}:`, error);
       }
     }
   }
 };
 
-// Adicionar timestamp de inicialização
-logger.info('🚨 CyberLab Vulnerable Logger initialized', {
+// Add initialization timestamp
+logger.info('CyberLab Vulnerable Logger initialized', {
   log_level: 'silly',
   security_level: 'NONE',
   log_directory: logDir,
-  warning: 'This logger is INTENTIONALLY INSECURE for educational purposes'
+  warning: 'This logger is INTENTIONALLY INSECURE.'
 });
 
 module.exports = {
@@ -298,7 +294,7 @@ module.exports = {
   logAuthBypass: logger.logAuthBypass,
   clearLogs: logger.clearLogs,
   vulnerableLogger: (req, res, next) => {
-    // Log simplificado temporário para debug
+    // Simple debug log
     try {
       logger.info(`${req.method} ${req.url}`, {
         ip: req.ip,
@@ -307,7 +303,6 @@ module.exports = {
     } catch (error) {
       console.warn('Logger error:', error.message);
     }
-    
     next();
   }
 };

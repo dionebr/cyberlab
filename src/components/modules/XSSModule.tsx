@@ -48,10 +48,10 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
             params.set('difficulty', difficulty);
           }
           url = `${API_BASE_URL}/api/xss/reflected?${params.toString()}`;
-          
+
           response = await fetch(url);
           const htmlContent = await response.text();
-          
+
           setResults({
             type: 'reflected',
             input: input,
@@ -63,6 +63,9 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
             educational_note: generateXSSEducationalNote(input, type, difficulty),
             iframe_content: htmlContent
           });
+
+          // Abrir automaticamente a URL refletida em nova aba/janela
+          window.open(url, '_blank');
           break;
 
         case 'stored':

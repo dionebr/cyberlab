@@ -1,9 +1,8 @@
 /**
- * 🚨 ENDPOINTS VULNERÁVEIS DE COMMAND INJECTION
- * 
- * ⚠️ Estes endpoints são INTENCIONALMENTE VULNERÁVEIS
- * 🎓 Para demonstração educacional de Command Injection
- * 🚨 NÃO usar em produção!
+ * VULNERABLE COMMAND INJECTION ENDPOINTS
+ * WARNING: These endpoints are INTENTIONALLY VULNERABLE
+ * For demonstration of Command Injection
+ * DO NOT use in production!
  */
 
 const express = require('express');
@@ -17,7 +16,7 @@ const { vulnerableAuth } = require('../middleware/auth');
 const router = express.Router();
 
 // ============================================
-// 🚨 PING COMMAND - COMMAND INJECTION BÁSICO
+// PING COMMAND - BASIC COMMAND INJECTION
 // ============================================
 router.post('/ping', (req, res) => {
   const { host, count = 4, timeout = 5 } = req.body;
@@ -44,7 +43,7 @@ router.post('/ping', (req, res) => {
     });
   }
   
-  // 🚨 Command injection vulnerável - concatenação direta
+  // Vulnerable command injection - direct concatenation
   const command = `ping -c ${count} -W ${timeout} ${host}`;
   
   logger.logVulnerableCommand(command, { host, count, timeout }, req.ip, null);
@@ -85,7 +84,7 @@ router.post('/ping', (req, res) => {
 });
 
 // ============================================
-// 🚨 NETWORK TOOLS - MULTIPLE COMMAND INJECTION
+// NETWORK TOOLS - MULTIPLE COMMAND INJECTION
 // ============================================
 router.post('/network-tools', (req, res) => {
   const { tool, target, options = '' } = req.body;
@@ -123,7 +122,7 @@ router.post('/network-tools', (req, res) => {
       command = `whois ${target} ${options}`;
       break;
     default:
-      // ⚠️ Tool personalizada - MUITO PERIGOSO!
+  // Custom tool - VERY DANGEROUS!
       command = `${tool} ${target} ${options}`;
   }
   
@@ -167,7 +166,7 @@ router.post('/network-tools', (req, res) => {
 });
 
 // ============================================
-// 🚨 FILE OPERATIONS - COMMAND INJECTION
+// FILE OPERATIONS - COMMAND INJECTION
 // ============================================
 router.post('/file-operations', vulnerableAuth, (req, res) => {
   const { operation, filepath, content, permissions } = req.body;
@@ -206,7 +205,7 @@ router.post('/file-operations', vulnerableAuth, (req, res) => {
       command = `grep -r "${content}" ${filepath}`;
       break;
     default:
-      // Operação customizada
+  // Custom operation
       command = `${operation} ${filepath} ${content} ${permissions}`;
   }
   
@@ -245,7 +244,7 @@ router.post('/file-operations', vulnerableAuth, (req, res) => {
 });
 
 // ============================================
-// 🚨 SYSTEM INFO - COMMAND EXECUTION
+// SYSTEM INFO - COMMAND EXECUTION
 // ============================================
 router.get('/system-info', (req, res) => {
   const { detail = 'basic', format = 'json' } = req.query;
@@ -271,12 +270,12 @@ router.get('/system-info', (req, res) => {
       commands = ['cat /etc/passwd', 'cat /etc/shadow', 'sudo -l', 'cat /etc/sudoers'];
       break;
     case 'custom':
-      // ⚠️ Comando customizado via query parameter - MUITO PERIGOSO!
+  // Custom command via query parameter - VERY DANGEROUS!
       const customCmd = req.query.cmd || 'echo "no command specified"';
       commands = [customCmd];
       break;
     default:
-      commands = [detail]; // Trata detail como comando direto!
+  commands = [detail]; // Treats detail as direct command!
   }
   
   const results = {};
@@ -327,7 +326,7 @@ router.get('/system-info', (req, res) => {
           }
         };
         
-        // ⚠️ Diferentes formatos de output
+  // Different output formats
         if (format === 'xml') {
           res.setHeader('Content-Type', 'application/xml');
           res.send(`<?xml version="1.0"?><response>${JSON.stringify(response)}</response>`);
@@ -343,7 +342,7 @@ router.get('/system-info', (req, res) => {
 });
 
 // ============================================
-// 🚨 LOG VIEWER - COMMAND INJECTION VIA PATH
+// LOG VIEWER - COMMAND INJECTION VIA PATH
 // ============================================
 router.get('/logs', (req, res) => {
   const { 
@@ -371,7 +370,7 @@ router.get('/logs', (req, res) => {
     command += ` | grep "${grep}"`;
   }
   
-  // ⚠️ Formato customizado permite command injection
+  // Custom format allows command injection
   if (format !== 'raw') {
     command += ` | ${format}`;
   }
@@ -416,7 +415,7 @@ router.get('/logs', (req, res) => {
 });
 
 // ============================================
-// 🚨 BACKUP UTILITY - COMMAND INJECTION
+// BACKUP UTILITY - COMMAND INJECTION
 // ============================================
 router.post('/backup', vulnerableAuth, (req, res) => {
   const { 
@@ -433,7 +432,7 @@ router.post('/backup', vulnerableAuth, (req, res) => {
     ip: req.ip 
   });
   
-  // 🚨 Comando de backup vulnerável
+  // Vulnerable backup command
   let command = `tar -czf ${destination}/backup_$(date +%Y%m%d_%H%M%S).tar.gz`;
   
   if (exclude) {
@@ -441,7 +440,7 @@ router.post('/backup', vulnerableAuth, (req, res) => {
   }
   
   if (compression !== 'gzip') {
-    // Permite compressão customizada - PERIGOSO!
+  // Allows custom compression - DANGEROUS!
     command = command.replace('-czf', `-${compression}f`);
   }
   
@@ -483,7 +482,7 @@ router.post('/backup', vulnerableAuth, (req, res) => {
 });
 
 // ============================================
-// 🚨 PROCESS MANAGER - COMMAND INJECTION
+// PROCESS MANAGER - COMMAND INJECTION
 // ============================================
 router.post('/process', vulnerableAuth, (req, res) => {
   const { action, process_name, signal = 'TERM', user = '' } = req.body;
@@ -516,7 +515,7 @@ router.post('/process', vulnerableAuth, (req, res) => {
       command = `ps aux | grep ${process_name}`;
       break;
     case 'custom':
-      // Ação customizada - MUITO PERIGOSO!
+  // Custom action - VERY DANGEROUS!
       command = req.body.custom_command || 'ps aux';
       break;
     default:

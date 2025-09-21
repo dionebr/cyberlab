@@ -1,9 +1,8 @@
 /**
- * 🚨 CONFIGURAÇÃO DE DATABASE VULNERÁVEL
- * 
- * ⚠️ Esta configuração é INTENCIONALMENTE INSEGURA
- * 🎓 Para fins educacionais em segurança cibernética
- * 🚨 NÃO usar em produção!
+ * VULNERABLE DATABASE CONFIGURATION
+ * WARNING: This configuration is INTENTIONALLY INSECURE
+ * For educationa      // Insert vulnerable data if file exl purpostsses in cybersecurity
+ * DO NOT use in production!
  */
 
 const mysql = require('mysql2');
@@ -11,30 +10,30 @@ const fs = require('fs');
 const path = require('path');
 const { logger } = require('../middleware/logger');
 
-// 🚨 CONFIGURAÇÕES VULNERÁVEIS - NÃO usar em produção!
+// VULNERABLE CONFIGURATIONS - DO NOT use in production!
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 3306,
   user: process.env.DB_USER || 'vulnerable_user',
-  password: process.env.DB_PASS || 'weak123', // Senha fraca
+  password: process.env.DB_PASS || 'weak123', // Weak password
   database: process.env.DB_NAME || 'cyberlab_vulnerable',
   charset: 'utf8mb4',
   
-  // CONFIGURAÇÕES PERIGOSAS:
-  ssl: false, // SSL DESABILITADO - VULNERÁVEL
-  insecureAuth: true, // Permite autenticação insegura
+  // DANGEROUS CONFIGURATIONS:
+  ssl: false, // SSL DISABLED - VULNERABLE
+  insecureAuth: true, // Allows insecure authentication
   acquireTimeout: 60000,
   timeout: 60000,
   reconnect: true,
   
-  // Configurações para múltiplas queries (SQL Injection)
-  multipleStatements: true, // PERIGOSO! Permite múltiplas queries
+  // Multiple statements configuration (SQL Injection)
+  multipleStatements: true, // DANGEROUS! Allows multiple queries
   
-  // Pool de conexões com configurações frouxas
+  // Connection pool with loose configurations
   connectionLimit: 100,
   queueLimit: 0,
   
-  // Flags perigosas
+  // Dangerous flags
   flags: [
     'FOUND_ROWS',
     'LONG_PASSWORD',
@@ -45,18 +44,18 @@ const dbConfig = {
   ]
 };
 
-// Criar pool de conexões (sem SSL)
+// Create connection pool (without SSL)
 const pool = mysql.createPool(dbConfig);
 
-// Função para executar queries SEM prepared statements - VULNERÁVEL!
+// Function to execute queries WITHOUT prepared statements - VULNERABLE!
 const executeVulnerableQuery = (query, params = []) => {
   return new Promise((resolve, reject) => {
-    // VULNERÁVEL: String concatenation em vez de prepared statements
+    // VULNERABLE: String concatenation instead of prepared statements
     const finalQuery = typeof params === 'object' && params.length > 0
-      ? query.replace(/\?/g, () => `'${params.shift()}'`) // PERIGOSO!
+      ? query.replace(/\?/g, () => `'${params.shift()}'`) // DANGEROUS!
       : query;
     
-    logger.warn(`🚨 Executing VULNERABLE query: ${finalQuery}`);
+    logger.warn(`Executing VULNERABLE query: ${finalQuery}`);
     
     pool.execute(finalQuery, (error, results, fields) => {
       if (error) {
@@ -69,10 +68,10 @@ const executeVulnerableQuery = (query, params = []) => {
   });
 };
 
-// Função para executar queries diretas (muito vulnerável)
+// Function to execute direct queries (very vulnerable)
 const executeDirectQuery = (query) => {
   return new Promise((resolve, reject) => {
-    logger.warn(`🚨 Executing DIRECT query (VERY DANGEROUS): ${query}`);
+    logger.warn(`Executing DIRECT query (VERY DANGEROUS): ${query}`);
     
     pool.query(query, (error, results, fields) => {
       if (error) {
@@ -85,7 +84,7 @@ const executeDirectQuery = (query) => {
   });
 };
 
-// Testar conexão
+// Test connection
 const testConnection = () => {
   return new Promise((resolve, reject) => {
     pool.getConnection((err, connection) => {
@@ -93,7 +92,7 @@ const testConnection = () => {
         logger.error('Database connection failed:', err);
         reject(err);
       } else {
-        logger.info('💀 Database connected successfully (WITHOUT SSL)');
+        logger.info('Database connected successfully (WITHOUT SSL)');
         connection.release();
         resolve();
       }
@@ -101,10 +100,10 @@ const testConnection = () => {
   });
 };
 
-// Inicializar dados vulneráveis
+// Initialize vulnerable data
 const initVulnerableData = async () => {
   try {
-    logger.info('🚨 Initializing vulnerable database schema and data...');
+    logger.info('Initializing vulnerable database schema and data...');
     
     // Verificar se os arquivos SQL existem
     const initPath = path.join(__dirname, '../database/init.sql');
@@ -115,10 +114,10 @@ const initVulnerableData = async () => {
       return;
     }
     
-    // Ler e executar script de inicialização
+    // Read and execute initialization script
     const initScript = fs.readFileSync(initPath, 'utf8');
     
-    // Executar múltiplas queries de uma vez - VULNERÁVEL
+    // Execute multiple queries at once - VULNERABLE
     try {
       await executeDirectQuery(initScript);
       logger.info('✅ Database schema initialized');
@@ -142,7 +141,7 @@ const initVulnerableData = async () => {
     
   } catch (error) {
     logger.error('Failed to initialize vulnerable database:', error);
-    // NÃO fazer throw para evitar crash do servidor
+    // Do NOT throw to avoid server crash
     logger.warn('⚠️ Continuing without database initialization...');
   }
 };

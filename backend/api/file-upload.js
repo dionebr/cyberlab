@@ -524,7 +524,7 @@ function serveFile(filePath, req, res) {
       const mimeTypes = {
         '.html': 'text/html',
         '.htm': 'text/html',
-        '.php': 'text/html', // PHP como HTML - PERIGOSO!
+  '.php': 'text/html', // PHP as HTML - DANGEROUS!
         '.js': 'application/javascript',
         '.css': 'text/css',
         '.json': 'application/json',

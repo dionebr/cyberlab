@@ -1,136 +1,136 @@
--- 🚨 CYBERLAB VULNERABLE DATABASE SCHEMA
--- ⚠️ Esta configuração é INTENCIONALMENTE INSEGURA
--- 🎓 Para fins educacionais em segurança cibernética
--- 🚨 NÃO usar em produção!
+-- CYBERLAB VULNERABLE DATABASE SCHEMA
+-- WARNING: This configuration is INTENTIONALLY INSECURE
+-- For educational purposes in cybersecurity
+-- DO NOT use in production!
 
--- Criar database se não existir
+-- Create database if not exists
 CREATE DATABASE IF NOT EXISTS cyberlab_vulnerable 
 CHARACTER SET utf8mb4 
 COLLATE utf8mb4_unicode_ci;
 
 USE cyberlab_vulnerable;
 
--- 🚨 TABELA DE USUÁRIOS - VULNERÁVEL
--- Senhas em texto plano, estrutura exposta, sem proteções
+-- USERS TABLE - VULNERABLE
+-- Plaintext passwords, exposed structure, no protections
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL,
-    password VARCHAR(255) NOT NULL, -- ⚠️ Senhas em texto plano!
-    password_hash VARCHAR(255), -- Algumas hashadas, outras não
+    password VARCHAR(255) NOT NULL, -- Plaintext passwords!
+    password_hash VARCHAR(255), -- Some hashed, others not
     role ENUM('user', 'admin', 'moderator') DEFAULT 'user',
     status ENUM('active', 'inactive', 'banned') DEFAULT 'active',
-    secret_token VARCHAR(255), -- ⚠️ Token secreto exposto!
-    api_key VARCHAR(255), -- ⚠️ API key exposta!
-    credit_card VARCHAR(20), -- ⚠️ Cartão de crédito sem criptografia!
-    ssn VARCHAR(11), -- ⚠️ SSN sem proteção!
-    salary DECIMAL(10,2), -- ⚠️ Informação sensível!
-    notes TEXT, -- Campo para XSS stored
+    secret_token VARCHAR(255), -- Exposed secret token!
+    api_key VARCHAR(255), -- Exposed API key!
+    credit_card VARCHAR(20), -- Credit card without encryption!
+    ssn VARCHAR(11), -- SSN without protection!
+    salary DECIMAL(10,2), -- Sensitive information!
+    notes TEXT, -- Field for stored XSS
     profile_pic VARCHAR(255),
     last_login DATETIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    -- Campos para demonstrar information disclosure
-    internal_id VARCHAR(50), -- ID interno que não deveria ser exposto
-    debug_info TEXT, -- Informações de debug
-    admin_notes TEXT -- Notas administrativas sensíveis
+    -- Fields to demonstrate information disclosure
+    internal_id VARCHAR(50), -- Internal ID that shouldn't be exposed
+    debug_info TEXT, -- Debug information
+    admin_notes TEXT -- Sensitive administrative notes
 );
 
--- 🚨 TABELA DE SESSÕES - VULNERÁVEL
--- Session IDs previsíveis, sem expiração adequada
+-- SESSIONS TABLE - VULNERABLE
+-- Predictable session IDs, no proper expiration
 CREATE TABLE IF NOT EXISTS sessions (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    session_id VARCHAR(255) NOT NULL, -- ⚠️ IDs previsíveis!
+    session_id VARCHAR(255) NOT NULL, -- Predictable IDs!
     user_id INT,
-    data TEXT, -- ⚠️ Dados de sessão em texto plano!
+    data TEXT, -- Session data in plaintext!
     ip_address VARCHAR(45),
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP, -- ⚠️ Sem expiração ou muito longa!
+    expires_at TIMESTAMP, -- No expiration or too long!
     is_admin BOOLEAN DEFAULT FALSE,
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 🚨 TABELA DE POSTS/COMENTÁRIOS - VULNERÁVEL A XSS
--- Armazena conteúdo HTML sem sanitização
+-- POSTS/COMMENTS TABLE - VULNERABLE TO XSS
+-- Stores HTML content without sanitization
 CREATE TABLE IF NOT EXISTS posts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
     title VARCHAR(255) NOT NULL,
-    content TEXT, -- ⚠️ HTML/JS não sanitizado!
-    html_content TEXT, -- ⚠️ HTML puro - XSS risk!
+    content TEXT, -- Unsanitized HTML/JS!
+    html_content TEXT, -- Pure HTML - XSS risk!
     is_published BOOLEAN DEFAULT FALSE,
     views INT DEFAULT 0,
     likes INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    -- Campos vulneráveis adicionais
-    raw_input TEXT, -- Input original do usuário
-    sanitized_content TEXT, -- "Sanitizado" mas com falhas
+    -- Additional vulnerable fields
+    raw_input TEXT, -- User's original input
+    sanitized_content TEXT, -- "Sanitized" but with flaws
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 🚨 TABELA DE UPLOADS - VULNERÁVEL
--- Permite qualquer tipo de arquivo, paths previsíveis
+-- UPLOADS TABLE - VULNERABLE
+-- Allows any file type, predictable paths
 CREATE TABLE IF NOT EXISTS file_uploads (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    original_filename VARCHAR(255), -- ⚠️ Nome original preservado!
-    stored_filename VARCHAR(255), -- ⚠️ Path previsível!
-    file_path VARCHAR(500), -- ⚠️ Path completo exposto!
+    original_filename VARCHAR(255), -- Original name preserved!
+    stored_filename VARCHAR(255), -- Predictable path!
+    file_path VARCHAR(500), -- Full path exposed!
     file_size INT,
-    mime_type VARCHAR(100), -- ⚠️ Não validado adequadamente!
-    file_hash VARCHAR(64), -- Hash do arquivo (pode vazar informações)
-    is_public BOOLEAN DEFAULT TRUE, -- ⚠️ Público por padrão!
+    mime_type VARCHAR(100), -- Not properly validated!
+    file_hash VARCHAR(64), -- File hash (may leak information)
+    is_public BOOLEAN DEFAULT TRUE, -- Public by default!
     upload_ip VARCHAR(45),
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
-    -- Metadata perigosa
-    exif_data TEXT, -- ⚠️ EXIF data pode conter localização/device info!
-    virus_scan_result VARCHAR(50) DEFAULT 'not_scanned', -- ⚠️ Sem antivírus!
+    -- Dangerous metadata
+    exif_data TEXT, -- EXIF data may contain location/device info!
+    virus_scan_result VARCHAR(50) DEFAULT 'not_scanned', -- No antivirus!
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 🚨 TABELA DE LOGS - VULNERÁVEL
--- Armazena logs em database (performance issue + security risk)
+-- LOGS TABLE - VULNERABLE
+-- Stores logs in database (performance issue + security risk)
 CREATE TABLE IF NOT EXISTS security_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     event_type VARCHAR(50),
     user_id INT NULL,
     ip_address VARCHAR(45),
     user_agent TEXT,
-    request_data TEXT, -- ⚠️ Request completo incluindo senhas!
-    response_data TEXT, -- ⚠️ Response completo!
-    sql_query TEXT, -- ⚠️ Queries SQL executadas!
-    payload TEXT, -- ⚠️ Payloads de ataques!
+    request_data TEXT, -- Complete request including passwords!
+    response_data TEXT, -- Complete response!
+    sql_query TEXT, -- Executed SQL queries!
+    payload TEXT, -- Attack payloads!
     success BOOLEAN,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
-    -- Campos de auditoria vulneráveis
-    session_data TEXT, -- ⚠️ Dados de sessão completos!
-    cookies TEXT, -- ⚠️ Cookies capturados!
-    headers TEXT -- ⚠️ Headers HTTP completos!
+    -- Vulnerable audit fields
+    session_data TEXT, -- Complete session data!
+    cookies TEXT, -- Captured cookies!
+    headers TEXT -- Complete HTTP headers!
 );
 
--- 🚨 TABELA DE CONFIGURAÇÕES - VULNERÁVEL
--- Configurações do sistema acessíveis via SQL injection
+-- CONFIGURATION TABLE - VULNERABLE
+-- System configurations accessible via SQL injection
 CREATE TABLE IF NOT EXISTS system_config (
     id INT AUTO_INCREMENT PRIMARY KEY,
     config_key VARCHAR(100) UNIQUE,
-    config_value TEXT, -- ⚠️ Valores sensíveis em texto plano!
+    config_value TEXT, -- Sensitive values in plaintext!
     is_sensitive BOOLEAN DEFAULT FALSE,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- 🚨 TABELA DE PRODUTOS/E-COMMERCE - VULNERÁVEL
--- Para demonstrar IDOR (Insecure Direct Object References)
+-- PRODUCTS/E-COMMERCE TABLE - VULNERABLE
+-- To demonstrate IDOR (Insecure Direct Object References)
 CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255),
@@ -140,16 +140,16 @@ CREATE TABLE IF NOT EXISTS products (
     category_id INT,
     is_active BOOLEAN DEFAULT TRUE,
     
-    -- Campos sensíveis que podem vazar via IDOR
-    cost_price DECIMAL(10,2), -- ⚠️ Preço de custo - sensível!
-    supplier_info TEXT, -- ⚠️ Informações do fornecedor!
-    profit_margin DECIMAL(5,2), -- ⚠️ Margem de lucro!
-    internal_notes TEXT, -- ⚠️ Notas internas!
+    -- Sensitive fields that may leak via IDOR
+    cost_price DECIMAL(10,2), -- Cost price - sensitive!
+    supplier_info TEXT, -- Supplier information!
+    profit_margin DECIMAL(5,2), -- Profit margin!
+    internal_notes TEXT, -- Internal notes!
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 🚨 TABELA DE PEDIDOS - VULNERÁVEL A IDOR
+-- ORDERS TABLE - VULNERABLE TO IDOR
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
@@ -157,81 +157,81 @@ CREATE TABLE IF NOT EXISTS orders (
     status ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled'),
     shipping_address TEXT,
     
-    -- Informações de pagamento vulneráveis
+    -- Vulnerable payment information
     payment_method VARCHAR(50),
-    card_last_four VARCHAR(4), -- ⚠️ Últimos 4 dígitos do cartão!
-    transaction_id VARCHAR(100), -- ⚠️ ID da transação!
+    card_last_four VARCHAR(4), -- Card last 4 digits!
+    transaction_id VARCHAR(100), -- Transaction ID!
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- 🚨 TABELA PARA DEMONSTRAR SQL INJECTION AVANÇADA
+-- TABLE FOR ADVANCED SQL INJECTION DEMONSTRATION
 CREATE TABLE IF NOT EXISTS sensitive_data (
     id INT AUTO_INCREMENT PRIMARY KEY,
     data_type VARCHAR(50),
-    classified_info TEXT, -- ⚠️ Informações classificadas!
+    classified_info TEXT, -- Classified information!
     access_level ENUM('public', 'restricted', 'confidential', 'top_secret'),
     owner_id INT,
     
-    -- Dados que demonstram diferentes tipos de injection
-    json_data JSON, -- Para NoSQL-style injection
-    xml_data TEXT, -- Para XXE attacks
-    serialized_data BLOB, -- Para deserialization attacks
+    -- Data that demonstrates different types of injection
+    json_data JSON, -- For NoSQL-style injection
+    xml_data TEXT, -- For XXE attacks
+    serialized_data BLOB, -- For deserialization attacks
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
--- 🚨 CRIAR ÍNDICES VULNERÁVEIS
--- Índices que podem ajudar atacantes a entender a estrutura
+-- CREATE VULNERABLE INDEXES
+-- Indexes that may help attackers understand the structure
 
--- Index para facilitar SQL injection timing attacks
+-- Index to facilitate SQL injection timing attacks
 CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_email ON users(email);
 
--- Index para password timing attacks
+-- Index for password timing attacks
 CREATE INDEX idx_users_password ON users(password);
 
--- Indexes que facilitam enumeration
+-- Indexes that facilitate enumeration
 CREATE INDEX idx_sessions_user_id ON sessions(user_id);
 CREATE INDEX idx_posts_user_id ON posts(user_id);
 CREATE INDEX idx_orders_user_id ON orders(user_id);
 
--- 🚨 CRIAR USUÁRIO MYSQL VULNERÁVEL
--- Usuário com privilégios excessivos
+-- CREATE VULNERABLE MYSQL USER
+-- User with excessive privileges
 CREATE USER IF NOT EXISTS 'vulnerable_user'@'%' IDENTIFIED BY 'weak123';
 CREATE USER IF NOT EXISTS 'vulnerable_user'@'localhost' IDENTIFIED BY 'weak123';
 
--- ⚠️ PRIVILÉGIOS PERIGOSOS - NÃO fazer em produção!
+-- DANGEROUS PRIVILEGES - DO NOT do in production!
 GRANT ALL PRIVILEGES ON cyberlab_vulnerable.* TO 'vulnerable_user'@'%';
 GRANT ALL PRIVILEGES ON cyberlab_vulnerable.* TO 'vulnerable_user'@'localhost';
 
--- Privilégios adicionais perigosos
-GRANT FILE ON *.* TO 'vulnerable_user'@'%'; -- ⚠️ Permite ler/escrever arquivos!
-GRANT PROCESS ON *.* TO 'vulnerable_user'@'%'; -- ⚠️ Ver processos!
-GRANT SUPER ON *.* TO 'vulnerable_user'@'%'; -- ⚠️ Privilégios de super user!
+-- Additional dangerous privileges
+GRANT FILE ON *.* TO 'vulnerable_user'@'%'; -- Allows reading/writing files!
+GRANT PROCESS ON *.* TO 'vulnerable_user'@'%'; -- View processes!
+GRANT SUPER ON *.* TO 'vulnerable_user'@'%'; -- Super user privileges!
 
--- Aplicar mudanças
+-- Apply changes
 FLUSH PRIVILEGES;
 
--- 🚨 CONFIGURAÇÕES MYSQL VULNERÁVEIS
--- Estas configurações devem estar no my.cnf, mas incluímos aqui para documentação
+-- VULNERABLE MYSQL CONFIGURATIONS
+-- These configurations should be in my.cnf, but we include them here for documentation
 
--- SET GLOBAL general_log = 'ON'; -- ⚠️ Log todas as queries!
+-- SET GLOBAL general_log = 'ON'; -- Log all queries!
 -- SET GLOBAL general_log_file = '/var/log/mysql/general.log';
--- SET GLOBAL slow_query_log = 'ON'; -- ⚠️ Log queries lentas!
+-- SET GLOBAL slow_query_log = 'ON'; -- Log slow queries!
 -- SET GLOBAL log_queries_not_using_indexes = 'ON';
--- SET GLOBAL sql_mode = ''; -- ⚠️ Desabilita validações!
+-- SET GLOBAL sql_mode = ''; -- Disables validations!
 
--- Mostrar informações perigosas (para logs)
+-- Show dangerous information (for logs)
 SELECT 'Database schema created successfully' as status;
 SELECT USER() as current_user;
 SELECT DATABASE() as current_database;
 SELECT VERSION() as mysql_version;
 
--- Log da criação (para auditoria educacional)
+-- Creation log (for educational audit)
 INSERT INTO security_logs (event_type, request_data, success, created_at) VALUES 
 ('DATABASE_INIT', 'Vulnerable database schema created', TRUE, NOW());

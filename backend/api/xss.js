@@ -1,9 +1,8 @@
 /**
- * 🚨 ENDPOINTS VULNERÁVEIS DE XSS
- * 
- * ⚠️ Estes endpoints são INTENCIONALMENTE VULNERÁVEIS
- * 🎓 Para demonstração educacional de Cross-Site Scripting
- * 🚨 NÃO usar em produção!
+ * VULNERABLE XSS ENDPOINTS
+ * WARNING: These endpoints are INTENTIONALLY VULNERABLE
+ * For demonstration of Cross-Site Scripting
+ * DO NOT use in production!
  */
 
 const express = require('express');
@@ -14,7 +13,7 @@ const { vulnerableAuth } = require('../middleware/auth');
 const router = express.Router();
 
 // ============================================
-// 🚨 XSS REFLETIDO (REFLECTED XSS)
+// REFLECTED XSS
 // ============================================
 router.get('/reflected', (req, res) => {
   const { search, name, message, redirect } = req.query;
@@ -26,7 +25,7 @@ router.get('/reflected', (req, res) => {
     ip: req.ip 
   });
   
-  // ⚠️ HTML response que reflete input sem sanitização
+  // HTML response that reflects input without sanitization
   const htmlResponse = `
     <!DOCTYPE html>
     <html>
@@ -123,7 +122,7 @@ router.get('/reflected', (req, res) => {
 });
 
 // ============================================
-// 🚨 XSS ARMAZENADO (STORED XSS)
+// STORED XSS
 // ============================================
 router.post('/comments/add', async (req, res) => {
   try {
@@ -135,7 +134,7 @@ router.post('/comments/add', async (req, res) => {
       user_agent: req.get('User-Agent')
     });
     
-    // 🚨 Inserir comment diretamente no database SEM sanitização
+    // Insert comment directly into database WITHOUT sanitization
     const insertQuery = `
       INSERT INTO comments (name, email, comment, rating, ip_address, user_agent, created_at)
       VALUES ('${name}', '${email}', '${comment}', '${rating}', '${req.ip}', '${req.get('User-Agent')}', NOW())

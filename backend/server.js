@@ -1,12 +1,8 @@
 /**
- * 🚨 CYBERLAB PROFESSIONAL - BACKEND VULNERÁVEL
- * 
- * ⚠️  ATENÇÃO: Esta aplicação é INTENCIONALMENTE VULNERÁVEL
- * 🎓 Desenvolvida para educação em segurança cibernética
- * 🔒 Execute APENAS em ambiente isolado/containerizado
- * 📚 Para uso educacional e pesquisa em segurança
- * 
- * NÃO use em produção ou redes corporativas!
+ * CYBERLAB PROFESSIONAL - VULNERABLE BACKEND
+ * WARNING: This application is INTENTIONALLY VULNERABLE
+ * Run ONLY in isolated/containerized environments
+ * DO NOT use in production!
  */
 
 const express = require('express');
@@ -35,14 +31,14 @@ try {
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 🚨 CONFIGURAÇÕES INTENCIONALMENTE VULNERÁVEIS
-// Para fins educacionais - NÃO usar em produção!
+// INTENTIONALLY VULNERABLE CONFIGURATION
+// DO NOT use in production!
 
 // ============================================
-// 🔧 CONFIGURAÇÃO DE MIDDLEWARES VULNERÁVEIS
+// VULNERABLE MIDDLEWARE CONFIGURATION
 // ============================================
 
-// CORS permissivo - MUITO PERIGOSO!
+// Permissive CORS - VERY DANGEROUS!
 app.use(cors({
   origin: '*', // Permite qualquer origem!
   credentials: true, // Com credenciais!
@@ -51,126 +47,125 @@ app.use(cors({
   exposedHeaders: ['*'] // Expõe todos os headers!
 }));
 
-app.use(express.json({ limit: '50mb' })); // Limite muito alto!
+app.use(express.json({ limit: '50mb' })); // Very high limit!
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 
 // Logging vulnerável
 app.use(vulnerableLogger);
 
-// Headers inseguros
+// Insecure headers
 app.use(vulnerableHeaders);
 
-// Error handling que vaza informações
+// Error handling that leaks information
 app.use(vulnerableErrorHandler);
 
 // ============================================
-// 🚨 ROTAS DE API VULNERÁVEIS
+// VULNERABLE API ROUTES
 // ============================================
 
-// Sistema de autenticação vulnerável
+// Vulnerable authentication system
 try {
   app.use('/api/auth', require('./api/auth'));
 } catch (e) { console.warn('Auth routes not loaded:', e.message); }
 
-// Endpoints vulneráveis para demonstração de SQL Injection
+// Vulnerable endpoints for SQL Injection demonstration
 try {
   app.use('/api/vulnerable', require('./api/vulnerabilities'));
 } catch (e) { console.warn('SQL routes not loaded:', e.message); }
 
-// Endpoints vulneráveis para demonstração de XSS
+// Vulnerable endpoints for XSS demonstration
 try {
   app.use('/api/xss', require('./api/xss'));
 } catch (e) { console.warn('XSS routes not loaded:', e.message); }
 
-// Endpoints vulneráveis para demonstração de Command Injection
+// Vulnerable endpoints for Command Injection demonstration
 try {
   app.use('/api/cmd', require('./api/command-injection'));
 } catch (e) { console.warn('Command injection routes not loaded:', e.message); }
 
-// Endpoints vulneráveis para demonstração de File Upload
+// Vulnerable endpoints for File Upload demonstration
 try {
   app.use('/api/upload', require('./api/file-upload'));
 } catch (e) { console.warn('File upload routes not loaded:', e.message); }
 
 // ============================================
-// 🔧 ROTAS DE DEBUG E INFORMAÇÕES SENSÍVEIS
+// DEBUG ROUTES AND SENSITIVE INFORMATION
 // ============================================
 
-// Session management FRACO - VULNERÁVEL
+// WEAK session management - VULNERABLE
 app.use(session({
-  secret: 'weak-secret-123', // Secret fraco e hardcoded - PERIGOSO!
-  resave: true, // Sempre salva - ineficiente
-  saveUninitialized: true, // Salva sessões vazias
+  secret: 'weak-secret-123', // Weak and hardcoded secret - DANGEROUS!
+  resave: true, // Always saves - inefficient
+  saveUninitialized: true, // Saves empty sessions
   cookie: { 
-    secure: false, // HTTP permitido - VULNERÁVEL
-    httpOnly: false, // JS pode acessar - VULNERÁVEL para XSS
-    maxAge: 24 * 60 * 60 * 1000 * 7 // 7 dias - muito longo
+    secure: false, // HTTP allowed - VULNERABLE
+    httpOnly: false, // JS can access - VULNERABLE to XSS
+    maxAge: 24 * 60 * 60 * 1000 * 7 // 7 days - too long
   },
-  name: 'sessionid' // Nome previsível
+  name: 'sessionid' // Predictable name
 }));
 
-// Logging de requests (incluindo dados sensíveis)
+// Request logging (including sensitive data)
 app.use(morgan('combined', {
   stream: {
     write: (message) => {
-      // Log TUDO incluindo senhas e tokens - VULNERÁVEL
+  // Log EVERYTHING including passwords and tokens - VULNERABLE
       logger.info('HTTP Request:', message.trim());
     }
   }
 }));
 
-// Headers de segurança DESABILITADOS - VULNERÁVEL
+// Security headers DISABLED - VULNERABLE
 app.use(vulnerableHeaders); // Nosso middleware que DESABILITA proteções
 
-// Servir arquivos estáticos sem restrições
+// Serve static files without restrictions
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/logs', express.static(path.join(__dirname, 'logs'))); // PERIGOSO!
+app.use('/logs', express.static(path.join(__dirname, 'logs'))); // DANGEROUS!
 
 // ============================================
-// ROUTES VULNERÁVEIS
+// VULNERABLE ROUTES
 // ============================================
 
-// Root endpoint com informações sensíveis
+// Root endpoint with sensitive information
 app.get('/', (req, res) => {
   res.json({
-    message: '🚨 CyberLab Professional - Backend Vulnerável',
+  message: 'CyberLab Professional - Vulnerable Backend',
     version: '2.0.0',
     environment: process.env.NODE_ENV || 'development',
     database: {
       host: process.env.DB_HOST || 'localhost',
       port: process.env.DB_PORT || 3306,
-      user: process.env.DB_USER || 'vulnerable_user' // Expondo credenciais!
+      user: process.env.DB_USER || 'vulnerable_user' // Exposing credentials!
     },
     warnings: [
-      '⚠️ Esta aplicação é INTENCIONALMENTE VULNERÁVEL',
-      '🚨 NÃO use em ambientes de produção',
-      '🔒 Execute apenas em ambiente isolado',
-      '📚 Para fins educacionais apenas'
+      'WARNING: This application is INTENTIONALLY VULNERABLE',
+      'DO NOT use in production environments',
+      'Run only in isolated environments'
     ],
     endpoints: {
-      auth: '/api/auth/*',
-      sql: '/api/sql/*', 
-      xss: '/api/xss/*',
-      command: '/api/cmd/*',
-      file: '/api/file/*'
+  auth: '/api/auth/*',
+  sql: '/api/sql/*', 
+  xss: '/api/xss/*',
+  command: '/api/cmd/*',
+  file: '/api/file/*'
     }
   });
 });
 
-// Health check que vaza informações - VULNERÁVEL
+// Health check that leaks information - VULNERABLE
 app.get('/health', (req, res) => {
   res.json({
     status: 'vulnerable_by_design',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    memory: process.memoryUsage(), // Informações do sistema
-    environment: process.env, // VAZA TODAS as variáveis de ambiente!
+  memory: process.memoryUsage(), // System info
+  environment: process.env, // Leaks ALL environment variables!
     database_status: 'connected_without_ssl'
   });
 });
 
-// Debug endpoint que expõe código fonte - VULNERÁVEL
+// Debug endpoint that exposes source code - VULNERABLE
 app.get('/debug', (req, res) => {
   if (req.query.file) {
     const filePath = path.join(__dirname, req.query.file);
@@ -178,104 +173,92 @@ app.get('/debug', (req, res) => {
       const content = fs.readFileSync(filePath, 'utf8');
       res.json({ 
         file: req.query.file,
-        content: content // VAZA código fonte!
+  content: content // Leaks source code!
       });
     } catch (error) {
       res.json({ 
         error: error.message,
-        stack: error.stack // VAZA stack trace!
+  stack: error.stack // Leaks stack trace!
       });
     }
   } else {
     res.json({
       message: 'Debug endpoint - use ?file=path/to/file',
       example: '/debug?file=server.js',
-      warning: '🚨 This endpoint is EXTREMELY vulnerable!'
+  warning: 'This endpoint is EXTREMELY vulnerable!'
     });
   }
 });
 
 // ============================================
-// ERROR HANDLING VULNERÁVEL
+// VULNERABLE ERROR HANDLING
 // ============================================
 
-// 404 handler que vaza informações
+// 404 handler that leaks information
 app.use((req, res) => {
   res.status(404).json({
     error: 'Route not found',
     requested_url: req.originalUrl,
     method: req.method,
-    headers: req.headers, // VAZA todos os headers!
+  headers: req.headers, // Leaks all headers!
     ip: req.ip,
     user_agent: req.get('User-Agent'),
     timestamp: new Date().toISOString()
   });
 });
 
-// Global error handler que vaza stack traces
+// Global error handler that leaks stack traces
 app.use(vulnerableErrorHandler);
 
 // ============================================
 // SERVER STARTUP
 // ============================================
 
-// Handlers para evitar crashes
+// Handlers to avoid crashes
 process.on('uncaughtException', (error) => {
   logger.error('Uncaught Exception:', error);
-  // NÃO fazer exit aqui para manter o servidor rodando
+  // Do NOT exit here to keep server running
 });
 
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  // NÃO fazer exit aqui para manter o servidor rodando
+  // Do NOT exit here to keep server running
 });
 
-// Verificar conexão com database (sem SSL)
+// Check database connection (no SSL)
 db.testConnection()
   .then(() => {
-    logger.info('💀 Database connected (WITHOUT SSL) - VULNERABLE!');
-    
-    // Inicializar dados vulneráveis
+    logger.info('Database connected (WITHOUT SSL) - VULNERABLE!');
     db.initVulnerableData()
       .then(() => {
-        logger.info('🚨 Vulnerable data initialized successfully');
+        logger.info('Vulnerable data initialized successfully');
       })
       .catch(err => {
         logger.error('Failed to initialize vulnerable data:', err);
-        // Continuar mesmo com falha na inicialização
+        // Continue even if initialization fails
       });
   })
   .catch(err => {
     logger.error('Database connection failed:', err);
-    logger.warn('🚨 Starting server without database - some features may not work');
+  logger.warn('Starting server without database - some features may not work');
   });
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`
-╔═══════════════════════════════════════════════════════╗
-║                                                       ║
-║  🚨 CYBERLAB PROFESSIONAL - VULNERABLE BACKEND 🚨    ║
-║                                                       ║
-║  ⚠️  WARNING: INTENTIONALLY VULNERABLE APPLICATION   ║
-║  🎓 For cybersecurity education purposes only        ║
-║  🔒 Run ONLY in isolated/containerized environment   ║
-║                                                       ║
-║  🌐 Server running on: http://localhost:${PORT}        ║
-║  📚 Documentation: /CYBERLAB-PROFESSIONAL-ROADMAP.md ║
-║                                                       ║
-║  🚨 DO NOT USE IN PRODUCTION ENVIRONMENTS! 🚨        ║
-║                                                       ║
-╚═══════════════════════════════════════════════════════╝
-  `);
-  
-  logger.info(`🚨 CyberLab Vulnerable Backend started on port ${PORT}`);
-  logger.warn('⚠️ This server is INTENTIONALLY VULNERABLE - Educational use only!');
+CYBERLAB PROFESSIONAL - VULNERABLE BACKEND
+WARNING: INTENTIONALLY VULNERABLE APPLICATION
+Run ONLY in isolated/containerized environment
+Server running on: http://localhost:${PORT}
+DO NOT USE IN PRODUCTION ENVIRONMENTS!
+`);
+  logger.info(`CyberLab Vulnerable Backend started on port ${PORT}`);
+  logger.warn('This server is INTENTIONALLY VULNERABLE.');
 });
 
 // Graceful shutdown
 process.on('SIGINT', () => {
-  logger.info('🛑 Shutting down CyberLab Vulnerable Backend...');
+  logger.info('Shutting down CyberLab Vulnerable Backend...');
   if (db && db.close) {
     db.close();
   }
@@ -283,7 +266,7 @@ process.on('SIGINT', () => {
 });
 
 process.on('SIGTERM', () => {
-  logger.info('🛑 Received SIGTERM, shutting down gracefully...');
+  logger.info('Received SIGTERM, shutting down gracefully...');
   if (db && db.close) {
     db.close();
   }
