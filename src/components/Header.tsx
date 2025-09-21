@@ -32,7 +32,7 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-sidebar/95 backdrop-blur-lg border-b border-sidebar-border shadow-cyber">
-      <div className="flex h-12 items-center justify-between px-6 w-full">
+      <div className="flex h-20 items-center justify-between px-6 w-full" style={{ height: '4.0rem' }}>
         {/* Left side - Sidebar Toggle */}
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-8 w-8 hover:bg-accent hover:text-accent-foreground" />

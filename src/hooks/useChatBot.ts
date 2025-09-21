@@ -89,9 +89,35 @@ export const useChatBot = () => {
 
   // Initialize chat with greeting
   useEffect(() => {
-    if (state.messages.length === 0) {
-      const greeting = generateGreeting(state.context);
-      addBotMessage(greeting);
+    const initializeChat = () => {
+      if (state.messages.length === 0) {
+        const greeting = generateGreeting(state.context);
+        setTimeout(() => addBotMessage(greeting), 500);
+      }
+    };
+    initializeChat();
+  }, []);
+
+  useEffect(() => {
+    if (state.context && state.messages.length > 0) {
+      // Update greeting based on context change
+      const lastMessage = state.messages[state.messages.length - 1];
+      if (lastMessage.type === 'bot' && lastMessage.content.includes('Good')) {
+        const newGreeting = generateGreeting(state.context);
+        // Update the last message if it's a greeting
+        setState(prev => {
+          const updatedMessages = [...prev.messages];
+          updatedMessages[updatedMessages.length - 1] = {
+            ...lastMessage,
+            content: newGreeting
+          };
+          saveHistory(updatedMessages);
+          return {
+            ...prev,
+            messages: updatedMessages
+          };
+        });
+      }
     }
   }, [state.context]);
 
@@ -140,12 +166,16 @@ export const useChatBot = () => {
   }, [saveHistory]);
 
   const addBotMessage = useCallback((content: string, payloads?: string[]) => {
+    // Prevent duplicate greetings
+    if (content.includes('Good') && state.messages.some(msg => msg.content.includes('Good'))) {
+      return;
+    }
     return addMessage({
       type: 'bot',
       content,
       payloads
     });
-  }, [addMessage]);
+  }, [addMessage, state.messages]);
 
   const addUserMessage = useCallback((content: string) => {
     return addMessage({
@@ -274,19 +304,34 @@ export const useChatBot = () => {
     });
   }, [saveHistory]);
 
-  const clearHistory = useCallback(() => {
+    const clearHistory = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
     setState(prev => ({
       ...prev,
       messages: []
     }));
-    localStorage.removeItem(STORAGE_KEY);
     
-    // Re-add greeting
+    // Re-add greeting after clearing
     setTimeout(() => {
       const greeting = generateGreeting(state.context);
-      addBotMessage(greeting);
-    }, 100);
-  }, [state.context, addBotMessage]);
+      addMessage({
+        type: 'bot',
+        content: greeting
+      });
+    }, 500);
+  }, [state.context]);
+
+  // Clear duplicates on initialization
+  useEffect(() => {
+    if (state.messages.length > 10) {
+      // Clear excessive messages
+      localStorage.removeItem(STORAGE_KEY);
+      setState(prev => ({
+        ...prev,
+        messages: []
+      }));
+    }
+  }, []);
 
   const exportPayloads = useCallback((payloads: string[]) => {
     const text = payloads.join('\n');

@@ -22,8 +22,17 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
   } = useChatBot();
 
   const [inputValue, setInputValue] = useState('');
+  const [forceRender, setForceRender] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Force re-render to ensure chat state updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setForceRender(prev => prev + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -129,22 +138,19 @@ export const FloatingChat = ({ className }: FloatingChatProps) => {
         )}
       >
         <button
-          onClick={toggleChat}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleChat();
+          }}
           className={cn(
             "relative bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400",
             "text-white p-4 rounded-full shadow-2xl transform transition-all duration-300",
-            "hover:scale-110 active:scale-95 group animate-pulse hover:animate-none",
+            "hover:scale-110 active:scale-95 group hover:animate-none",
             "border border-cyan-400/50"
           )}
         >
           <MessageCircle className="w-6 h-6" />
-          
-          {/* Unread indicator */}
-          {hasUnreadMessages && (
-            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-bounce">
-              !
-            </div>
-          )}
           
           {/* Floating rings animation */}
           <div className="absolute inset-0 rounded-full border-2 border-cyan-400/30 animate-ping" />
