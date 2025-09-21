@@ -4,9 +4,9 @@
 
 .buy-me-coffee-container {
   position: fixed;
-  bottom: 16px;
-  right: 8px;
-  left: auto;
+  bottom: 40px;
+  left: 16px;
+  right: auto;
   z-index: 100;
   opacity: 0.85;
 }
