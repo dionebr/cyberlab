@@ -74,14 +74,14 @@ export const DeveloperSection: React.FC<DeveloperSectionProps> = ({ className = 
       </div>
       
       {/* Content Area */}
-      <div className="min-h-[220px] flex items-center justify-center">
+      <div className="min-h-[160px] flex items-center justify-center">
         {showPhoto ? (
           <div className="flex flex-col items-center space-y-6 animate-in fade-in-0 duration-700">
             <div className="relative">
               <img 
                 src="/perfil.webp" 
                 alt="Dione Lima" 
-                className="w-36 h-36 rounded-full border-4 border-cyan-400 shadow-2xl object-cover transition-all duration-500 hover:scale-105"
+                className="w-28 h-28 rounded-full border-4 border-cyan-400 shadow-2xl object-cover transition-all duration-500 hover:scale-105"
                 loading="lazy"
               />
               <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 opacity-20 animate-pulse"></div>

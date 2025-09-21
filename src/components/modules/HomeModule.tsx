@@ -76,9 +76,6 @@ export const HomeModule = () => {
         </CardContent>
       </Card>
 
-      {/* Developer Section */}
-      <DeveloperSection className="my-8" />
-
       {/* Features Grid */}
       <div className="grid md:grid-cols-3 gap-6">
         {features.map((feature, index) => {
@@ -164,6 +161,9 @@ export const HomeModule = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Developer Section */}
+      <DeveloperSection className="my-8" />
     </div>
   );
 };

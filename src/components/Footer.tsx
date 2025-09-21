@@ -38,9 +38,8 @@ export const Footer = ({ className }: FooterProps) => {
       className
     )}>
       <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-          
-          {/* Social Links */}
+        {/* Social Links and Coffee Button - Centered */}
+        <div className="flex flex-col items-center space-y-4">
           <div className="flex items-center space-x-6">
             {socialLinks.map((link) => {
               const IconComponent = link.icon;
@@ -84,7 +83,7 @@ export const Footer = ({ className }: FooterProps) => {
         </div>
 
         {/* Copyright */}
-        <div className="mt-4 pt-4 border-t border-sidebar-border/30 text-center">
+        <div className="mt-6 pt-4 border-t border-sidebar-border/30 text-center">
           <p className="text-sm text-sidebar-foreground/50">
             © 2025 CyberLab. Educational platform for cybersecurity learning.
           </p>
