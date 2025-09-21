@@ -43,6 +43,7 @@ const translations = {
     "learn.network_security": "Network Security",
     "learn.os_security": "Operating Systems Security",
     "learn.programming_security": "Secure Programming",
+    "learn.vulnerabilities": "Vulnerabilities in this level",
     "home.title": "Welcome to CyberLab",
     "home.subtitle": "Interactive Web Security Learning Platform",
     "home.description": "CyberLab is an interactive educational platform designed to teach and train web security in a controlled and safe environment. The goal of this platform is to empower students, developers, and security professionals to learn, explore, and understand common web application vulnerabilities through hands-on practice.",
@@ -164,6 +165,13 @@ const translations = {
     "totp.weak_secret": "Weak secret and long time window",
     "totp.no_rate_limiting": "No rate limiting on attempts",
     "totp.secret_exposure": "Secret exposed in responses",
+    "totp.no_attempts": "No login attempts yet",
+    "totp.session_bypass": "Check session handling for pre-authentication bypass",
+    "totp.timing_attacks": "Try timing attacks on code validation",
+    "totp.check_devtools": "Enable 2FA and check browser Developer Tools",
+    "totp.check_network": "Look for secrets in Network tab responses",
+    "totp.check_console": "Check Console for debug information",
+    "totp.check_html": "Inspect HTML source for hidden data attributes",
     
     // JWT Authentication Module
     "jwt.title": "JWT Authentication",
@@ -314,6 +322,12 @@ const translations = {
     "auth_bypass.sql_injection_successful": "SQL Injection successful!",
     "auth_bypass.case_sensitivity_bypass": "Case sensitivity bypass successful!",
     "auth_bypass.secure_auth_successful": "✅ Secure authentication successful",
+    "auth_bypass.welcome": "Welcome",
+    "auth_bypass.authenticated_successfully": "You are successfully authenticated",
+    "auth_bypass.back_to_login": "Back to Login",
+    "auth_bypass.success": "Success",
+    "auth_bypass.failed": "Failed",
+    "auth_bypass.logout": "Logout",
     
     // Brute Force Module
     "brute_force.title": "Brute Force Attack",
@@ -629,6 +643,7 @@ const translations = {
     "learn.network_security": "Segurança de Rede",
     "learn.os_security": "Segurança de Sistemas Operacionais",
     "learn.programming_security": "Programação Segura",
+    "learn.vulnerabilities": "Vulnerabilidades neste nível",
     "home.title": "Bem-vindo ao CyberLab",
     "home.subtitle": "Plataforma Interativa de Aprendizado em Segurança Web",
     "home.description": "O CyberLab é uma plataforma educacional interativa projetada para ensinar e treinar segurança web em um ambiente controlado e seguro. O objetivo desta plataforma é capacitar estudantes, desenvolvedores e profissionais de segurança a aprender, explorar e compreender vulnerabilidades comuns de aplicações web através da prática prática.",
@@ -744,8 +759,15 @@ const translations = {
     "totp.hard_level": "Difícil - Vazamento Criptográfico",
     "totp.exploitation_tips": "Dicas de Exploração:",
     "totp.weak_secret": "Secret fraco e janela de tempo longa",
-    "totp.no_rate_limiting": "Sem limitação de tentativas",
+    "totp.no_rate_limiting": "Sem limitação de tentativas - força bruta possível",
     "totp.secret_exposure": "Secret exposto em respostas",
+    "totp.no_attempts": "Ainda não há tentativas de login",
+    "totp.session_bypass": "Verifique manipulação de sessão para bypass de pré-autenticação",
+    "totp.timing_attacks": "Tente ataques de timing na validação de código",
+    "totp.check_devtools": "Ative 2FA e verifique as Ferramentas de Desenvolvedor",
+    "totp.check_network": "Procure por secrets na aba Network",
+    "totp.check_console": "Verifique o Console para informações de debug",
+    "totp.check_html": "Inspecione o código HTML para atributos de dados ocultos",
     
     // JWT Authentication Module
     "jwt.title": "Autenticação JWT",
@@ -886,6 +908,12 @@ const translations = {
     "auth_bypass.common_bypasses": "Técnicas Comuns de Bypass",
     "auth_bypass.sql_injection": "Injeção SQL:",
     "auth_bypass.logic_flaws": "Falhas Lógicas:",
+    "auth_bypass.welcome": "Bem-vindo",
+    "auth_bypass.authenticated_successfully": "Você foi autenticado com sucesso",
+    "auth_bypass.back_to_login": "Voltar ao Login",
+    "auth_bypass.success": "Sucesso",
+    "auth_bypass.failed": "Falhou",
+    "auth_bypass.logout": "Sair",
     
     // Brute Force Module
     "brute_force.title": "Ataque de Força Bruta",

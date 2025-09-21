@@ -374,7 +374,7 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDh/nCDmXaEqxN4
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="flex items-center gap-2">
-                🔑 JWT Authentication
+                🔑 {t('jwt.title')}
                 <Badge variant={securityLevel === 'easy' ? 'destructive' : securityLevel === 'medium' ? 'default' : 'secondary'}>
                   {securityLevel?.toUpperCase()}
                 </Badge>
@@ -390,7 +390,7 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDh/nCDmXaEqxN4
         {/* Authentication Interface */}
         <Card>
           <CardHeader>
-            <CardTitle>Login Interface</CardTitle>
+            <CardTitle>{t('jwt.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {!isLoggedIn ? (
@@ -415,7 +415,7 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDh/nCDmXaEqxN4
                   />
                 </div>
                 <Button onClick={handleLogin} className="w-full">
-                  Login & Generate JWT
+                  {t('jwt.login_generate')}
                 </Button>
                 <div className="text-sm text-muted-foreground">
                   <p>Try: admin/admin123, user/password, guest/guest123</p>
@@ -439,7 +439,7 @@ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDh/nCDmXaEqxN4
         {/* JWT Token Display */}
         <Card>
           <CardHeader>
-            <CardTitle>JWT Token</CardTitle>
+            <CardTitle>{t('jwt.current_token')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {token ? (

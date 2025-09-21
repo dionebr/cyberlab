@@ -263,14 +263,14 @@ export const TOTP2FAModule: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="flex items-center gap-2">
-                🔐 TOTP/2FA Authentication
+                🔐 {t('totp.title')}
                 <Badge variant={securityLevel === 'easy' ? 'destructive' : securityLevel === 'medium' ? 'default' : 'secondary'}>
                   {securityLevel?.toUpperCase()}
                 </Badge>
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-2">{levelInfo.description}</p>
             </div>
-            <Button variant="outline" onClick={logout}>Logout</Button>
+            <Button variant="outline" onClick={logout}>{t('auth_bypass.logout')}</Button>
           </div>
         </CardHeader>
       </Card>
@@ -279,7 +279,7 @@ export const TOTP2FAModule: React.FC = () => {
         {/* Main Interface */}
         <Card>
           <CardHeader>
-            <CardTitle>Authentication Interface</CardTitle>
+            <CardTitle>{t('totp.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {!isLoggedIn ? (
@@ -287,7 +287,7 @@ export const TOTP2FAModule: React.FC = () => {
                 {loginStep === 'credentials' && (
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="username">Username</Label>
+                      <Label htmlFor="username">{t('auth_bypass.username')}</Label>
                       <Input
                         id="username"
                         value={username}
@@ -296,7 +296,7 @@ export const TOTP2FAModule: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="password">Password</Label>
+                      <Label htmlFor="password">{t('auth_bypass.password')}</Label>
                       <Input
                         id="password"
                         type="password"
@@ -306,7 +306,7 @@ export const TOTP2FAModule: React.FC = () => {
                       />
                     </div>
                     <Button onClick={handleCredentialLogin} className="w-full">
-                      Login
+                      {t('auth_bypass.login')}
                     </Button>
                     <div className="text-sm text-muted-foreground">
                       <p>Try: admin/admin123, user/password, test/test123</p>
@@ -317,13 +317,13 @@ export const TOTP2FAModule: React.FC = () => {
                 {loginStep === '2fa' && (
                   <div className="space-y-4">
                     <div className="text-center">
-                      <h3 className="font-semibold">Two-Factor Authentication</h3>
+                      <h3 className="font-semibold">{t('totp.title')}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Enter the 6-digit code from your authenticator app
+                        {t('totp.enter_code')}
                       </p>
                     </div>
                     <div>
-                      <Label htmlFor="totpCode">Authentication Code</Label>
+                      <Label htmlFor="totpCode">{t('totp.verify_code')}</Label>
                       <Input
                         id="totpCode"
                         value={totpCode}
@@ -334,10 +334,10 @@ export const TOTP2FAModule: React.FC = () => {
                       />
                     </div>
                     <Button onClick={handle2FAVerification} className="w-full">
-                      Verify Code
+                      {t('totp.verify_code')}
                     </Button>
                     <Button variant="outline" onClick={() => setLoginStep('credentials')} className="w-full">
-                      Back to Login
+                      {t('auth_bypass.back_to_login')}
                     </Button>
                   </div>
                 )}
@@ -346,30 +346,30 @@ export const TOTP2FAModule: React.FC = () => {
               <div className="text-center space-y-4">
                 <div className="p-6 bg-green-50 dark:bg-green-950 rounded-lg">
                   <h3 className="text-xl font-semibold text-green-800 dark:text-green-200">
-                    Welcome, {currentUser?.username}!
+                    {t('auth_bypass.welcome')}, {currentUser?.username}!
                   </h3>
                   <p className="text-green-600 dark:text-green-300">
-                    You are successfully authenticated
+                    {t('auth_bypass.authenticated_successfully')}
                   </p>
                 </div>
                 
                 {!currentUser?.enabled2fa && (
                   <div className="space-y-4">
                     <Button onClick={enable2FA} className="w-full">
-                      Enable Two-Factor Authentication
+                      {t('totp.enable_2fa')}
                     </Button>
                   </div>
                 )}
 
                 {qrCodeUrl && (
                   <div className="space-y-4">
-                    <h4 className="font-semibold">Setup 2FA</h4>
+                    <h4 className="font-semibold">{t('totp.enable_2fa')}</h4>
                     <div className="flex justify-center">
                       <img src={qrCodeUrl} alt="QR Code" className="border rounded" />
                     </div>
                     <div className="text-sm space-y-2">
-                      <p>Scan this QR code with your authenticator app</p>
-                      <p className="font-mono text-xs bg-muted p-2 rounded">Secret: {secret}</p>
+                      <p>{t('totp.qr_code_instruction')}</p>
+                      <p className="font-mono text-xs bg-muted p-2 rounded">{t('totp.secret_key')} {secret}</p>
                     </div>
                   </div>
                 )}
@@ -381,12 +381,12 @@ export const TOTP2FAModule: React.FC = () => {
         {/* Login Attempts Dashboard */}
         <Card>
           <CardHeader>
-            <CardTitle>Login Attempts Dashboard</CardTitle>
+            <CardTitle>{t('totp.login_attempts')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {loginAttempts.length === 0 ? (
-                <p className="text-muted-foreground text-sm">No login attempts yet</p>
+                <p className="text-muted-foreground text-sm">{t('totp.no_attempts')}</p>
               ) : (
                 loginAttempts.map((attempt) => (
                   <div key={attempt.id} className="flex items-center justify-between p-2 border rounded text-sm">
@@ -397,7 +397,7 @@ export const TOTP2FAModule: React.FC = () => {
                       </div>
                     </div>
                     <Badge variant={attempt.success ? "default" : "destructive"}>
-                      {attempt.success ? "Success" : "Failed"}
+                      {attempt.success ? t('auth_bypass.success') : t('auth_bypass.failed')}
                     </Badge>
                   </div>
                 ))
@@ -415,7 +415,7 @@ export const TOTP2FAModule: React.FC = () => {
         <CardContent>
           <div className="space-y-4">
             <div>
-              <h4 className="font-semibold mb-2">Vulnerabilities in this level:</h4>
+              <h4 className="font-semibold mb-2">{t('learn.vulnerabilities')}:</h4>
               <ul className="space-y-1">
                 {levelInfo.vulnerabilities.map((vuln, index) => (
                   <li key={index} className="flex items-center gap-2">
@@ -428,7 +428,7 @@ export const TOTP2FAModule: React.FC = () => {
             
             {securityLevel === 'easy' && (
               <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded border">
-                <h5 className="font-semibold text-yellow-800 dark:text-yellow-200">Exploitation Tips:</h5>
+                <h5 className="font-semibold text-yellow-800 dark:text-yellow-200">{t('totp.exploitation_tips')}</h5>
                 <ul className="text-sm text-yellow-700 dark:text-yellow-300 mt-2 space-y-1">
                   <li>• Try brute-forcing the 6-digit code (10-minute window)</li>
                   <li>• Check if the secret follows a predictable pattern</li>
@@ -439,23 +439,23 @@ export const TOTP2FAModule: React.FC = () => {
             
             {securityLevel === 'medium' && (
               <div className="bg-orange-50 dark:bg-orange-950 p-4 rounded border">
-                <h5 className="font-semibold text-orange-800 dark:text-orange-200">Exploitation Tips:</h5>
+                <h5 className="font-semibold text-orange-800 dark:text-orange-200">{t('totp.exploitation_tips')}</h5>
                 <ul className="text-sm text-orange-700 dark:text-orange-300 mt-2 space-y-1">
-                  <li>• No rate limiting on 2FA attempts - brute force possible</li>
-                  <li>• Check session handling for pre-authentication bypass</li>
-                  <li>• Try timing attacks on code validation</li>
+                  <li>• {t('totp.no_rate_limiting')}</li>
+                  <li>• {t('totp.session_bypass')}</li>
+                  <li>• {t('totp.timing_attacks')}</li>
                 </ul>
               </div>
             )}
             
             {securityLevel === 'hard' && (
               <div className="bg-red-50 dark:bg-red-950 p-4 rounded border">
-                <h5 className="font-semibold text-red-800 dark:text-red-200">Exploitation Tips:</h5>
+                <h5 className="font-semibold text-red-800 dark:text-red-200">{t('totp.exploitation_tips')}</h5>
                 <ul className="text-sm text-red-700 dark:text-red-300 mt-2 space-y-1">
-                  <li>• Enable 2FA and check browser Developer Tools</li>
-                  <li>• Look for secrets in Network tab responses</li>
-                  <li>• Check Console for debug information</li>
-                  <li>• Inspect HTML source for hidden data attributes</li>
+                  <li>• {t('totp.check_devtools')}</li>
+                  <li>• {t('totp.check_network')}</li>
+                  <li>• {t('totp.check_console')}</li>
+                  <li>• {t('totp.check_html')}</li>
                 </ul>
               </div>
             )}
