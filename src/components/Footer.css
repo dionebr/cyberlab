@@ -1,0 +1,349 @@
+/* Responsive footer adjustments */
+@media (max-width: 768px) {
+  .footer-content {
+    padding: 1rem;
+  }
+  
+  .social-links {
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  
+  .creator-info {
+    text-align: center;
+  }
+  
+  .creator-photo {
+    left: -40px;
+    width: 50px;
+    height: 50px;
+  }
+}
+.footer-creator {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.1));
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-creator::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+  border-radius: 12px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.footer-creator:hover::before {
+  opacity: 0.3;
+}
+
+/* Social icons hover effects */
+.social-icon {
+  position: relative;
+  overflow: hidden;
+}
+
+.social-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, currentColor 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+  opacity: 0;
+  z-index: -1;
+}
+
+.social-icon:hover::before {
+  width: 100%;
+  height: 100%;
+  opacity: 0.1;
+}
+
+/* Coffee button special effects */
+.coffee-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.coffee-button::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%);
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
+  opacity: 0;
+}
+
+.coffee-button:hover::before {
+  opacity: 1;
+  transform: rotate(45deg) translate(50%, 50%);
+}
+
+/* Coffee steam animation */
+.coffee-steam {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.coffee-button:hover .coffee-steam {
+  opacity: 1;
+}
+
+.coffee-steam::before,
+.coffee-steam::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 15px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50% 50% 50% 50% / 0% 0% 100% 100%;
+  animation: steam 1.5s ease-in-out infinite;
+}
+
+.coffee-steam::before {
+  left: 0;
+  animation-delay: 0s;
+}
+
+.coffee-steam::after {
+  left: 2px;
+  animation-delay: 0.3s;
+}
+
+@keyframes steam {
+  0% {
+    transform: translateY(0) scaleX(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-8px) scaleX(1.2);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-15px) scaleX(0.8);
+    opacity: 0;
+  }
+}
+
+/* Animated gradient text for creator name */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #06b6d4, #3b82f6, #8b5cf6, #06b6d4);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Pulse animation for heart */
+@keyframes heart-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.heart-pulse {
+  animation: heart-pulse 2s ease-in-out infinite;
+}
+
+/* Glow effect for online status */
+.status-glow {
+  box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+}
+
+/* Footer creator photo hover effect */
+.creator-hover {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.creator-hover::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  background: linear-gradient(45deg, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #f59e0b, #06b6d4);
+  background-size: 400% 400%;
+  border-radius: 15px;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease;
+  animation: gradientRotate 4s ease infinite;
+}
+
+.creator-hover:hover::before {
+  opacity: 1;
+}
+
+.creator-hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 12px;
+}
+
+.creator-hover:hover::after {
+  opacity: 1;
+}
+
+.creator-photo {
+  position: absolute;
+  top: 50%;
+  left: -80px;
+  transform: translateY(-50%) scale(0) rotate(-10deg);
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  background: linear-gradient(45deg, #06b6d4, #3b82f6) padding-box,
+              linear-gradient(45deg, #06b6d4, #3b82f6, #8b5cf6, #ec4899) border-box;
+  box-shadow: 
+    0 0 25px rgba(6, 182, 212, 0.6),
+    0 0 50px rgba(6, 182, 212, 0.4),
+    0 8px 32px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 20;
+  filter: brightness(1.1) saturate(1.2);
+}
+
+.creator-photo::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, transparent, rgba(6, 182, 212, 0.3), transparent);
+  animation: photoGlow 2s ease-in-out infinite alternate;
+  z-index: -1;
+}
+
+.creator-hover:hover .creator-photo {
+  transform: translateY(-50%) scale(1) rotate(0deg);
+  opacity: 1;
+  left: -85px;
+}
+
+/* Floating particles effect */
+.creator-hover:hover::after {
+  background: 
+    radial-gradient(2px 2px at 20% 30%, rgba(6, 182, 212, 0.8), transparent),
+    radial-gradient(1px 1px at 80% 70%, rgba(59, 130, 246, 0.8), transparent),
+    radial-gradient(1px 1px at 40% 80%, rgba(139, 92, 246, 0.8), transparent),
+    radial-gradient(2px 2px at 90% 20%, rgba(236, 72, 153, 0.8), transparent);
+  animation: particleFloat 3s ease-in-out infinite;
+}
+
+@keyframes gradientRotate {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes photoGlow {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+}
+
+/* Text glow effect on hover */
+.creator-hover:hover .gradient-text {
+  text-shadow: 
+    0 0 10px rgba(6, 182, 212, 0.8),
+    0 0 20px rgba(6, 182, 212, 0.5),
+    0 0 30px rgba(6, 182, 212, 0.3);
+  animation: textPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes textPulse {
+  0% {
+    filter: brightness(1);
+  }
+  100% {
+    filter: brightness(1.3);
+  }
+}
+
+/* Remove heart pulse animation */
+.heart-pulse {
+  animation: none;
+}
+@media (max-width: 768px) {
+  .footer-content {
+    padding: 1rem;
+  }
+  
+  .social-links {
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  
+  .creator-info {
+    text-align: center;
+  }
+}

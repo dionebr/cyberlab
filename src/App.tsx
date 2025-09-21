@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
-import BuyMeACoffee from "@/components/BuyMeACoffee";
+import { Footer } from "@/components/Footer";
+import { FloatingChat } from "@/components/FloatingChat";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -13,6 +14,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Learn from "./pages/Learn";
 import Challenge from "./pages/Challenge";
+import "./components/FloatingChat.css";
+import "./components/Footer.css";
 
 const queryClient = new QueryClient();
 
@@ -32,20 +35,23 @@ const App = () => (
                 }}
               >
                 <SidebarProvider defaultOpen={true}>
-                  <div className="min-h-screen flex w-full">
-                    <Routes>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/learn" element={<Learn />} />
-                      <Route path="/learn/:category" element={<Learn />} />
-                      <Route path="/learn/:category/:level" element={<Learn />} />
-                      <Route path="/challenges/:moduleId" element={<Challenge />} />
-                      <Route path="/challenges/:moduleId/:level" element={<Challenge />} />
-                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                      <BuyMeACoffee />
+                  <div className="min-h-screen flex flex-col w-full">
+                    <div className="flex-1 flex">
+                      <Routes>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/learn" element={<Learn />} />
+                        <Route path="/learn/:category" element={<Learn />} />
+                        <Route path="/learn/:category/:level" element={<Learn />} />
+                        <Route path="/challenges/:moduleId" element={<Challenge />} />
+                        <Route path="/challenges/:moduleId/:level" element={<Challenge />} />
+                        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </div>
+                    <Footer />
                   </div>
                 </SidebarProvider>
+                <FloatingChat />
               </BrowserRouter>
             </TooltipProvider>
           </LearnProgressProvider>

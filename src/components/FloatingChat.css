@@ -1,0 +1,299 @@
+/* Floating Chat Animations and Styles */
+
+/* Ensure floating chat is above everything */
+.floating-chat-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.floating-chat-container > div {
+  pointer-events: auto;
+}
+
+/* Cyberpunk glitch effect for chat button */
+@keyframes glitch {
+  0% {
+    box-shadow: 
+      0 0 20px rgba(6, 182, 212, 0.5),
+      inset 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+  25% {
+    box-shadow: 
+      2px 0 0 rgba(239, 68, 68, 0.8),
+      0 0 20px rgba(6, 182, 212, 0.5),
+      inset 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+  50% {
+    box-shadow: 
+      -2px 0 0 rgba(34, 197, 94, 0.8),
+      0 0 20px rgba(6, 182, 212, 0.5),
+      inset 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+  75% {
+    box-shadow: 
+      0 0 20px rgba(6, 182, 212, 0.5),
+      inset 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+  100% {
+    box-shadow: 
+      0 0 20px rgba(6, 182, 212, 0.5),
+      inset 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+}
+
+/* Apply glitch effect on hover */
+.floating-chat-button:hover {
+  animation: glitch 0.3s ease-in-out;
+}
+
+/* Smooth slide-in animation for chat window */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.chat-window-enter {
+  animation: slideInLeft 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Message typing animation */
+@keyframes typing {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+}
+
+/* Custom scrollbar for chat messages */
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background-color: rgba(107, 114, 128, 0.5);
+  border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(107, 114, 128, 0.8);
+}
+
+/* Pulse animation for online indicator */
+@keyframes pulse-online {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.online-indicator {
+  animation: pulse-online 2s ease-in-out infinite;
+}
+
+/* Matrix-style text shadow for security assistant */
+.security-text {
+  text-shadow: 
+    0 0 5px rgba(6, 182, 212, 0.5),
+    0 0 10px rgba(6, 182, 212, 0.3),
+    0 0 15px rgba(6, 182, 212, 0.2);
+}
+
+/* Holographic border effect */
+@keyframes holographic {
+  0% {
+    border-color: rgba(6, 182, 212, 0.5);
+    box-shadow: 
+      0 0 10px rgba(6, 182, 212, 0.3),
+      inset 0 0 10px rgba(6, 182, 212, 0.1);
+  }
+  33% {
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 
+      0 0 10px rgba(139, 92, 246, 0.3),
+      inset 0 0 10px rgba(139, 92, 246, 0.1);
+  }
+  66% {
+    border-color: rgba(236, 72, 153, 0.5);
+    box-shadow: 
+      0 0 10px rgba(236, 72, 153, 0.3),
+      inset 0 0 10px rgba(236, 72, 153, 0.1);
+  }
+  100% {
+    border-color: rgba(6, 182, 212, 0.5);
+    box-shadow: 
+      0 0 10px rgba(6, 182, 212, 0.3),
+      inset 0 0 10px rgba(6, 182, 212, 0.1);
+  }
+}
+
+.holographic-border {
+  animation: holographic 3s ease-in-out infinite;
+}
+
+/* Code block styling within chat messages */
+.chat-code-block {
+  background: rgba(17, 24, 39, 0.8);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.875rem;
+  color: rgba(34, 197, 94, 0.9);
+  margin: 8px 0;
+  position: relative;
+  overflow-x: auto;
+}
+
+.chat-code-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.5), transparent);
+}
+
+/* Payload export button animation */
+@keyframes exportGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 10px rgba(6, 182, 212, 0.5),
+      0 0 20px rgba(6, 182, 212, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
+  }
+}
+
+.export-payload-button:hover {
+  animation: exportGlow 0.8s ease-in-out infinite;
+}
+
+/* Floating rings animation for chat button */
+@keyframes floatingRing {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.floating-ring {
+  animation: floatingRing 2s ease-out infinite;
+}
+
+/* Unread message indicator bounce */
+@keyframes unreadBounce {
+  0%, 20%, 60%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  80% {
+    transform: translateY(-4px);
+  }
+}
+
+.unread-indicator {
+  animation: unreadBounce 1s ease-in-out infinite;
+}
+
+/* Message slide-in animation */
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.message-enter {
+  animation: messageSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Backdrop blur for glass effect */
+.glass-effect {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(75, 85, 99, 0.2);
+}
+
+/* Cyber grid pattern overlay */
+.cyber-grid::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .chat-window {
+    width: calc(100vw - 32px);
+    max-width: 380px;
+    right: 16px !important;
+    bottom: 16px !important;
+  }
+  
+  .floating-chat-button {
+    bottom: 24px !important;
+    right: 24px !important;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .chat-messages {
+    scrollbar-color: rgba(107, 114, 128, 0.5) transparent;
+  }
+}
