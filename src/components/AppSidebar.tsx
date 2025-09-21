@@ -86,6 +86,16 @@ const challengeModules = [
     icon: Users, 
     color: "warning"
   },
+  { 
+    id: "totp-2fa", 
+    icon: Key, 
+    color: "info"
+  },
+  { 
+    id: "jwt-authentication", 
+    icon: Shield, 
+    color: "success"
+  },
 ];
 
 // Static names for vulnerability modules - always in English (technical terms)
@@ -101,6 +111,8 @@ const moduleNames = {
   "brute-force": "Brute Force",
   "insecure-captcha": "Insecure CAPTCHA",
   "weak-session": "Weak Session IDs",
+  "totp-2fa": "TOTP/2FA Authentication",
+  "jwt-authentication": "JWT Authentication",
 };
 
 export function AppSidebar() {

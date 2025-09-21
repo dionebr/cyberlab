@@ -10,6 +10,8 @@ import { FileUploadModule } from "./modules/FileUploadModule";
 import { InsecureCaptchaModule } from "./modules/InsecureCaptchaModule";
 import { WeakSessionModule } from "./modules/WeakSessionModule";
 import { SQLBlindModule } from "./modules/SQLBlindModule";
+import { TOTP2FAModule } from "./modules/TOTP2FAModule";
+import { JWTAuthenticationModule } from "./modules/JWTAuthenticationModule";
 import { useLanguage } from "../hooks/useLanguage";
 
 interface ModuleContentProps {
@@ -47,6 +49,10 @@ export const ModuleContent = ({ activeModule, difficulty, language }: ModuleCont
         return <WeakSessionModule difficulty={difficulty} />;
       case "sql-blind":
         return <SQLBlindModule difficulty={difficulty} />;
+      case "totp-2fa":
+        return <TOTP2FAModule />;
+      case "jwt-authentication":
+        return <JWTAuthenticationModule />;
       default:
         return <HomeModule />;
     }
