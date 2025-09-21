@@ -276,6 +276,24 @@ export const useChatBot = () => {
       };
     }
 
+    // Check for TOTP/2FA questions
+    if (input.includes('totp') || input.includes('2fa') || input.includes('two factor') || input.includes('authenticator')) {
+      const totpVuln = vulnerabilities.find(v => v.id === 'totp-2fa');
+      return {
+        content: `${t('chat.totp_2fa_help')}\n\n${totpVuln?.payloads.map((p, i) => `${i + 1}. \`${p}\``).join('\n')}\n\n${t('chat.totp_check_secrets')}`,
+        payloads: totpVuln?.payloads
+      };
+    }
+
+    // Check for JWT questions
+    if (input.includes('jwt') || input.includes('json web token') || input.includes('token')) {
+      const jwtVuln = vulnerabilities.find(v => v.id === 'jwt-auth');
+      return {
+        content: `${t('chat.jwt_help')}\n\n${jwtVuln?.payloads.map((p, i) => `${i + 1}. \`${p}\``).join('\n')}\n\n${t('chat.jwt_try_algorithms')}`,
+        payloads: jwtVuln?.payloads
+      };
+    }
+
     // Check for error-related questions
     if (input.includes('error') || input.includes('not working') || input.includes('failed')) {
       return {

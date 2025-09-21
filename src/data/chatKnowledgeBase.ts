@@ -161,6 +161,72 @@ export const vulnerabilities: Vulnerability[] = [
     ]
   },
 
+  // TOTP/2FA Authentication
+  {
+    id: "totp-2fa",
+    name: "TOTP/2FA Authentication",
+    category: "Authentication",
+    description: "Time-Based One-Time Password vulnerabilities and bypass techniques",
+    payloads: [
+      "000000", "123456", "111111", "999999",
+      "Brute force 6-digit codes within time window",
+      "Race condition on token validation",
+      "Secret prediction: btoa(\"admin_secret_123\").substring(0,16)",
+      "Time window manipulation attacks"
+    ],
+    solutions: [
+      "Use cryptographically secure secret generation",
+      "Implement strict rate limiting (3-5 attempts max)",
+      "Never expose secrets in client-side code",
+      "Use constant-time comparisons for validation",
+      "Implement proper session management"
+    ],
+    commonErrors: [
+      "Invalid TOTP code",
+      "Code expired or reused",
+      "Rate limit exceeded",
+      "Secret generation failed"
+    ],
+    difficulty: "hard",
+    references: [
+      "https://datatracker.ietf.org/doc/html/rfc6238",
+      "https://owasp.org/www-community/controls/Multi_factor_authentication_cheat_sheet"
+    ]
+  },
+
+  // JWT Authentication
+  {
+    id: "jwt-auth",
+    name: "JWT Authentication",
+    category: "Authentication", 
+    description: "JSON Web Token vulnerabilities including algorithm confusion and signature bypass",
+    payloads: [
+      "Algorithm none: {\"alg\": \"none\", \"typ\": \"JWT\"}",
+      "Weak HMAC secret: 'secret', 'key', '123456'",
+      "Algorithm confusion: Change RS256 to HS256",
+      "JKU header injection: Point to malicious JWKS endpoint",
+      "Modified payload: {\"role\": \"admin\", \"username\": \"admin\"}"
+    ],
+    solutions: [
+      "Explicitly specify and validate expected algorithm", 
+      "Never accept 'none' algorithm in production",
+      "Whitelist trusted JKU domains",
+      "Use separate keys for signing and verification",
+      "Implement proper key management and rotation"
+    ],
+    commonErrors: [
+      "Invalid signature",
+      "Algorithm not allowed",
+      "Token expired",
+      "JKU domain not whitelisted"
+    ],
+    difficulty: "expert",
+    references: [
+      "https://auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp/",
+      "https://portswigger.net/web-security/jwt"
+    ]
+  },
+
   // Authentication Bypass
   {
     id: "auth-bypass",
@@ -441,6 +507,81 @@ export const challenges: Challenge[] = [
       "Try privilege escalation",
       "Explore file system access"
     ]
+  },
+  
+  {
+    id: "totp-2fa-challenge",
+    name: "TOTP/2FA Authentication Challenge",
+    module: "totp-2fa",
+    commonIssues: [
+      {
+        error: "Invalid TOTP code",
+        solution: "Check if the secret is predictable or leaked",
+        hint: "Look in browser dev tools for exposed secrets or try brute force during extended time windows"
+      },
+      {
+        error: "Code already used",
+        solution: "Each TOTP code should only be valid once",
+        hint: "Wait for the next time window or check for race conditions"
+      },
+      {
+        error: "Rate limit exceeded", 
+        solution: "Too many invalid attempts",
+        hint: "Check if rate limiting can be bypassed or if there's session state confusion"
+      }
+    ],
+    hints: [
+      "Check if secrets follow predictable patterns",
+      "Look for extended time windows (>30 seconds)",
+      "Inspect client-side code for secret exposure",
+      "Test for session state manipulation",
+      "Try brute force during wide time windows"
+    ],
+    nextSteps: [
+      "Exploit weak secret generation",
+      "Attempt session manipulation",
+      "Look for cryptographic leaks in browser"
+    ]
+  },
+  
+  {
+    id: "jwt-authentication-challenge",
+    name: "JWT Authentication Challenge",
+    module: "jwt-authentication", 
+    commonIssues: [
+      {
+        error: "Invalid signature",
+        solution: "JWT signature verification failed",
+        hint: "Try the 'none' algorithm attack or algorithm confusion"
+      },
+      {
+        error: "Algorithm not allowed",
+        solution: "Server rejected the algorithm",
+        hint: "Check which algorithms are accepted and try algorithm confusion attacks"
+      },
+      {
+        error: "Token expired",
+        solution: "JWT has expired",
+        hint: "Generate a new token with extended expiration or no expiration"
+      },
+      {
+        error: "JKU domain not trusted",
+        solution: "Server doesn't trust the JKU URL",
+        hint: "Try using trusted domains or look for domain bypass techniques"
+      }
+    ],
+    hints: [
+      "Try setting algorithm to 'none' and remove signature",
+      "Test algorithm confusion (RS256 -> HS256)",
+      "Look for weak HMAC secrets like 'secret'",
+      "Check for JKU header injection",
+      "Inspect /public-key endpoint for key material"
+    ],
+    nextSteps: [
+      "Attempt none algorithm bypass",
+      "Try algorithm confusion attacks", 
+      "Exploit JKU header injection"
+    ]
   }
 ];
 
@@ -471,6 +612,22 @@ export const contextualSuggestions = {
     "Try double extensions like shell.php.jpg",
     "Use MIME type spoofing with magic bytes",
     "Test null byte injection filename.php%00.jpg"
+  ],
+  
+  "totp-2fa": [
+    "Check if secret follows predictable pattern",
+    "Try brute forcing 6-digit codes during extended time windows",
+    "Look for session state confusion in pre-authentication",
+    "Inspect browser developer tools for leaked secrets",
+    "Test for rate limiting bypass on 2FA attempts"
+  ],
+  
+  "jwt-authentication": [
+    "Try setting algorithm to 'none' and remove signature",
+    "Test with weak HMAC secrets like 'secret' or 'key'",
+    "Attempt algorithm confusion (RS256 to HS256)",
+    "Look for JKU header injection opportunities",
+    "Check if server fetches keys from user-controlled URLs"
   ]
 };
 
