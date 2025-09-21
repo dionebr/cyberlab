@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Alert, AlertDescription } from "../ui/alert";
 import { useLanguage } from "../../hooks/useLanguage";
+import { DeveloperSection } from "../DeveloperSection";
 
 export const HomeModule = () => {
   const { t } = useLanguage();
@@ -74,6 +75,9 @@ export const HomeModule = () => {
           </p>
         </CardContent>
       </Card>
+
+      {/* Developer Section */}
+      <DeveloperSection className="my-8" />
 
       {/* Features Grid */}
       <div className="grid md:grid-cols-3 gap-6">
