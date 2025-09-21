@@ -350,26 +350,6 @@ export const XSSModule = ({ difficulty }: XSSModuleProps) => {
               </code>
             </div>
 
-            {/* Live XSS Demo (in iframe for safety) */}
-            {results.iframe_content && (
-              <div>
-                <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-warning" />
-                  Live XSS Demonstration
-                </h4>
-                <div className="border border-warning rounded-lg p-2">
-                  <iframe 
-                    srcDoc={results.iframe_content}
-                    className="w-full h-96 border-0 rounded"
-                    sandbox="allow-scripts allow-same-origin"
-                    title="XSS Demo"
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  ⚠️ XSS payload executed in isolated iframe above
-                </p>
-              </div>
-            )}
 
             {/* URL Information */}
             {results.url_used && (
